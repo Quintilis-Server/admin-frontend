@@ -1,0 +1,42 @@
+.main-home{
+    padding: 1em;
+    background: var(--bg-secondary);
+    width: 65em;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    main{
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        gap:2em;
+    }
+    border-radius: 10px;
+
+
+    .buttons{
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        width: max-content;
+        gap: 3em;
+        background-color: rgba(0,0,0,0.2);
+        border-radius: 10px;
+        padding: 1em;
+        a{
+            cursor: pointer;
+        }
+    }
+    .list{
+
+        .item-list{
+            border: 1px solid var(--border);
+            transition: .2s all var(--transition-medium);
+            padding: 1em;
+            border-radius: 10px;
+            &:hover{
+                border-color: var(--border-hover);
+            }
+        }
+    }
+}

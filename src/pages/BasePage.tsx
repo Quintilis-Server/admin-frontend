@@ -26,24 +26,6 @@ export abstract class BasePage<P extends BaseProps, S extends PageState> extends
 
     componentDidMount() {
         document.title = `${this.state.title} - Quintilis`
-        this.checkAuthStatus();
-    }
-
-    componentDidUpdate() {
-        this.checkAuthStatus();
-    }
-
-    private checkAuthStatus() {
-        if (this.context.loading) {
-            return; // Wait until context finishes verifying the token
-        }
-
-        if (!this.context.isLoggedIn) {
-            window.location.href = AuthService.getLoginUrl()
-        } else if (!this.context.isAdmin) {
-            alert("Not admin")
-            window.location.href = FRONTEND_URL
-        }
     }
 
     protected getError(err: BaseException | null) {
@@ -68,15 +50,82 @@ export abstract class BasePage<P extends BaseProps, S extends PageState> extends
         )
     }
 
+    private renderSessionExpiredModal() {
+        return (
+            <div className="session-expired-overlay">
+                <div className="session-expired-modal">
+                    <div className="session-expired-icon">⚠️</div>
+                    <h2>Sessão Expirada</h2>
+                    <p>Sua sessão expirou, mas seu trabalho está salvo nesta página.</p>
+                    <p className="session-expired-hint">Faça login novamente para continuar.</p>
+                    <div className="session-expired-actions">
+                        <button
+                            className="session-expired-btn session-expired-btn-primary"
+                            onClick={() => {
+                                window.location.href = AuthService.getLoginUrl(window.location.pathname);
+                            }}
+                        >
+                            Fazer Login
+                        </button>
+                        <button
+                            className="session-expired-btn session-expired-btn-secondary"
+                            onClick={() => {
+                                // Tenta re-validar (caso o user tenha logado em outra aba)
+                                this.context.revalidate();
+                            }}
+                        >
+                            Já fiz login
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    private renderNotAdminModal() {
+        return (
+            <div className="session-expired-overlay">
+                <div className="session-expired-modal">
+                    <div className="session-expired-icon">🚫</div>
+                    <h2>Acesso Negado</h2>
+                    <p>Você não tem permissão de administrador.</p>
+                    <div className="session-expired-actions">
+                        <button
+                            className="session-expired-btn session-expired-btn-primary"
+                            onClick={() => {
+                                window.location.href = FRONTEND_URL;
+                            }}
+                        >
+                            Ir para o site
+                        </button>
+                        <button
+                            className="session-expired-btn session-expired-btn-secondary"
+                            onClick={() => {
+                                AuthService.logout();
+                            }}
+                        >
+                            Sair
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     protected abstract renderContent(): React.ReactNode;
 
     render() {
+        const showSessionExpired = !this.context.loading && !this.context.isLoggedIn;
+        const showNotAdmin = !this.context.loading && this.context.isLoggedIn && !this.context.isAdmin;
+
         return (
             <>
                 <Header />
                 {this.state.err ? (
                     this.getError(this.state.err)
                 ) : this.renderContent()}
+                {showSessionExpired && this.renderSessionExpiredModal()}
+                {showNotAdmin && this.renderNotAdminModal()}
                 {/*<Footer/>*/}
             </>
         )

@@ -1,8 +1,8 @@
-import type {FormSchema, FormState} from "../../types/FormOption.ts";
-import type {BaseProps} from "../../types/PageTypes.ts";
-import {BaseFormPage} from "../BaseFormPage.tsx";
-import {BaseException} from "../../exceptions/BaseException.ts";
-import {ErrorCode} from "../../types/ApiResponseType.ts";
+import type {FormSchema, FormState} from "../types/FormOption.ts";
+import type {BaseProps} from "../types/PageTypes.ts";
+import {BaseFormPage} from "./BaseFormPage.tsx";
+import {BaseException} from "../exceptions/BaseException.ts";
+import {ErrorCode} from "../types/ApiResponseType.ts";
 
 export abstract class BaseCreationPage<
     T extends object,
@@ -18,7 +18,7 @@ export abstract class BaseCreationPage<
         try {
             this.setState(prevState => ({ ...prevState, loading: true }))
 
-            const response = await this.post(`/${resource}/new`, this.state.formData);
+            const response = await this.postToApi<T, T>(`${resource}/new`, this.state.formData);
 
             if(!response) {
                 throw new BaseException(ErrorCode.UNKNOWN_ERROR)

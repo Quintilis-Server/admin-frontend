@@ -2,6 +2,7 @@ import {BaseComponent} from "./BaseComponent.tsx";
 import "../stylesheet/NavBarStyle.scss"
 import {UserContext} from "../context/UserContext.tsx";
 import * as React from "react";
+import {AuthService} from "../service/AuthService.ts";
 
 export class Header extends BaseComponent {
 
@@ -21,10 +22,9 @@ export class Header extends BaseComponent {
                         <span className="logo-bottom">Admin</span>
                     </a>
 
-
                     <div className={`nav-links`}>
                         <a>Minecraft</a>
-                        <a>Forum</a>
+                        <a href="/forum">Forum</a>
                         <a>Eventos</a>
                     </div>
 
