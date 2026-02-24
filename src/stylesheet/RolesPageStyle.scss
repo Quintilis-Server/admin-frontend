@@ -1,0 +1,584 @@
+.roles-page {
+    padding: 2em;
+    background: var(--bg-secondary);
+    width: 65em;
+    max-width: 100%;
+    border-radius: 10px;
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2em;
+
+        h1 {
+            font-family: var(--font-heading);
+            font-size: 2rem;
+            color: var(--text-primary);
+        }
+    }
+
+    .roles-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.2em;
+    }
+
+    .role-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 1.5em;
+        transition: all var(--transition-fast);
+        cursor: pointer;
+        text-decoration: none;
+        display: block;
+
+        &:hover {
+            border-color: var(--border-hover);
+            background: var(--bg-card-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .role-card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.8em;
+            margin-bottom: 1em;
+        }
+
+        .role-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4em;
+            padding: 0.3em 0.8em;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #fff;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .role-priority {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-left: auto;
+        }
+
+        .role-display-name {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: 0.5em;
+        }
+
+        .role-permissions-count {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+
+            span {
+                color: var(--accent);
+                font-weight: 600;
+            }
+        }
+    }
+}
+
+.role-edit-page {
+    padding: 2em;
+    background: var(--bg-secondary);
+    width: 65em;
+    max-width: 100%;
+    border-radius: 10px;
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2em;
+
+        h1 {
+            font-family: var(--font-heading);
+            font-size: 2rem;
+            color: var(--text-primary);
+        }
+
+        .back-link {
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color var(--transition-fast);
+
+            &:hover {
+                color: var(--accent-light);
+            }
+        }
+    }
+
+    .role-info {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 1.5em;
+        margin-bottom: 2em;
+        display: flex;
+        align-items: center;
+        gap: 1em;
+
+        .role-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4em;
+            padding: 0.4em 1em;
+            border-radius: 20px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .role-details {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+    }
+
+    .permissions-section {
+        h2 {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            margin-bottom: 1.5em;
+        }
+    }
+
+    .permission-group {
+        margin-bottom: 1.5em;
+
+        h3 {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.8em;
+            padding-bottom: 0.5em;
+            border-bottom: 1px solid var(--border);
+        }
+    }
+
+    .permission-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 0.6em;
+    }
+
+    .permission-item {
+        display: flex;
+        align-items: center;
+        gap: 0.8em;
+        padding: 0.6em 0.8em;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all var(--transition-fast);
+
+        &:hover {
+            border-color: var(--border-hover);
+            background: var(--bg-card-hover);
+        }
+
+        &.active {
+            border-color: var(--accent-dim);
+            background: var(--accent-glow);
+        }
+
+        input[type="checkbox"] {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--border);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            position: relative;
+
+            &:checked {
+                background: var(--accent);
+                border-color: var(--accent);
+
+                &::after {
+                    content: "✓";
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    color: #fff;
+                    font-size: 0.7rem;
+                    font-weight: bold;
+                }
+            }
+        }
+
+        .permission-name {
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .permission-desc {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+    }
+
+    .save-button {
+        margin-top: 2em;
+        padding: 0.8em 2em;
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all var(--transition-fast);
+
+        &:hover {
+            background: var(--accent-light);
+            box-shadow: 0 4px 16px var(--accent-glow-strong);
+        }
+
+        &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    }
+}
+
+.users-page {
+    padding: 2em;
+    background: var(--bg-secondary);
+    width: 65em;
+    max-width: 100%;
+    border-radius: 10px;
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2em;
+
+        h1 {
+            font-family: var(--font-heading);
+            font-size: 2rem;
+            color: var(--text-primary);
+        }
+    }
+
+    .users-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.8em;
+    }
+
+    .user-card {
+        display: flex;
+        align-items: center;
+        gap: 1em;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 1em 1.5em;
+        transition: all var(--transition-fast);
+        cursor: pointer;
+        text-decoration: none;
+
+        &:hover {
+            border-color: var(--border-hover);
+            background: var(--bg-card-hover);
+            transform: translateX(4px);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--accent-glow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: var(--accent);
+            font-size: 1rem;
+        }
+
+        .user-info {
+            flex: 1;
+
+            .user-name {
+                font-size: 1rem;
+                color: var(--text-primary);
+                font-weight: 500;
+            }
+
+            .user-email {
+                font-size: 0.8rem;
+                color: var(--text-muted);
+            }
+        }
+
+        .user-roles {
+            display: flex;
+            gap: 0.4em;
+            flex-wrap: wrap;
+
+            .role-badge {
+                display: inline-flex;
+                align-items: center;
+                padding: 0.2em 0.6em;
+                border-radius: 12px;
+                font-size: 0.75rem;
+                font-weight: 600;
+                color: #fff;
+                text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            }
+        }
+    }
+}
+
+.user-roles-edit-page {
+    padding: 2em;
+    background: var(--bg-secondary);
+    width: 65em;
+    max-width: 100%;
+    border-radius: 10px;
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2em;
+
+        h1 {
+            font-family: var(--font-heading);
+            font-size: 2rem;
+            color: var(--text-primary);
+        }
+
+        .back-link {
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color var(--transition-fast);
+
+            &:hover {
+                color: var(--accent-light);
+            }
+        }
+    }
+
+    .user-info-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 1.5em;
+        margin-bottom: 2em;
+        display: flex;
+        align-items: center;
+        gap: 1em;
+
+        .user-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--accent-glow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: var(--accent);
+            font-size: 1.2rem;
+        }
+
+        .user-details {
+            .user-name {
+                font-size: 1.1rem;
+                color: var(--text-primary);
+                font-weight: 600;
+            }
+
+            .user-email {
+                font-size: 0.85rem;
+                color: var(--text-muted);
+            }
+        }
+    }
+
+    .roles-selection {
+        h2 {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            margin-bottom: 1.5em;
+        }
+    }
+
+    .role-toggle-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.8em;
+    }
+
+    .role-toggle-item {
+        display: flex;
+        align-items: center;
+        gap: 1em;
+        padding: 1em 1.5em;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all var(--transition-fast);
+
+        &:hover {
+            border-color: var(--border-hover);
+            background: var(--bg-card-hover);
+        }
+
+        &.active {
+            border-color: var(--accent-dim);
+            background: var(--accent-glow);
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            flex-shrink: 0;
+
+            input {
+                opacity: 0;
+                width: 0;
+                height: 0;
+            }
+
+            .slider {
+                position: absolute;
+                cursor: pointer;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(255, 255, 255, 0.1);
+                transition: 0.3s;
+                border-radius: 24px;
+
+                &::before {
+                    position: absolute;
+                    content: "";
+                    height: 18px;
+                    width: 18px;
+                    left: 3px;
+                    bottom: 3px;
+                    background-color: white;
+                    transition: 0.3s;
+                    border-radius: 50%;
+                }
+            }
+
+            input:checked+.slider {
+                background-color: var(--accent);
+            }
+
+            input:checked+.slider::before {
+                transform: translateX(20px);
+            }
+        }
+
+        .role-toggle-info {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 0.8em;
+
+            .role-badge {
+                display: inline-flex;
+                align-items: center;
+                padding: 0.3em 0.8em;
+                border-radius: 16px;
+                font-size: 0.85rem;
+                font-weight: 600;
+                color: #fff;
+            }
+
+            .role-name {
+                font-size: 0.9rem;
+                color: var(--text-secondary);
+            }
+        }
+    }
+
+    .save-button {
+        margin-top: 2em;
+        padding: 0.8em 2em;
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all var(--transition-fast);
+
+        &:hover {
+            background: var(--accent-light);
+            box-shadow: 0 4px 16px var(--accent-glow-strong);
+        }
+
+        &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    }
+}
+
+.loading-spinner {
+    text-align: center;
+    padding: 3em;
+    color: var(--text-muted);
+    font-size: 1rem;
+}
+
+.success-message {
+    padding: 0.8em 1.2em;
+    background: rgba(76, 175, 80, 0.15);
+    border: 1px solid rgba(76, 175, 80, 0.3);
+    border-radius: 8px;
+    color: #81c784;
+    font-size: 0.9rem;
+    margin-top: 1em;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.error-message {
+    padding: 0.8em 1.2em;
+    background: rgba(244, 67, 54, 0.15);
+    border: 1px solid rgba(244, 67, 54, 0.3);
+    border-radius: 8px;
+    color: #e57373;
+    font-size: 0.9rem;
+    margin-top: 1em;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

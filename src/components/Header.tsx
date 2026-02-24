@@ -1,8 +1,8 @@
-import {BaseComponent} from "./BaseComponent.tsx";
+import { BaseComponent } from "./BaseComponent.tsx";
 import "../stylesheet/NavBarStyle.scss"
-import {UserContext} from "../context/UserContext.tsx";
+import { UserContext } from "../context/UserContext.tsx";
 import * as React from "react";
-import {AuthService} from "../service/AuthService.ts";
+import { AuthService } from "../service/AuthService.ts";
 
 export class Header extends BaseComponent {
 
@@ -25,6 +25,8 @@ export class Header extends BaseComponent {
                     <div className={`nav-links`}>
                         <a>Minecraft</a>
                         <a href="/forum">Forum</a>
+                        <a href="/roles">Roles</a>
+                        <a href="/users">Users</a>
                         <a>Eventos</a>
                     </div>
 

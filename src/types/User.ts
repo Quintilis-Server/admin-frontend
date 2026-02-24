@@ -1,7 +1,7 @@
-export interface User{
+export interface User {
     id: string;
     username: string;
-    role: string;
+    roles: string[];
     avatarPath?: string;
     isVerified: boolean;
 }

@@ -148,7 +148,7 @@ export class UserProvider extends BaseComponent<{ children: ReactNode }, UserCon
             const user: User = {
                 id: decoded.user_id || decoded.sub,
                 username: decoded.username || decoded.preferred_username,
-                role: isAdmin ? 'ADMIN' : 'USER',
+                roles: roles,
                 avatarPath: decoded.avatar_path || undefined,
                 isVerified: decoded.email_verified || false
             };
