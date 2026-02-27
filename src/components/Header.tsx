@@ -2,7 +2,11 @@ import { BaseComponent } from "./BaseComponent.tsx";
 import "../stylesheet/NavBarStyle.scss"
 import { UserContext } from "../context/UserContext.tsx";
 import * as React from "react";
-import { AuthService } from "../service/AuthService.ts";
+import {AUTH_URL} from "../Consts.ts";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faArrowRightToBracket, faRightFromBracket, faUser} from "@fortawesome/free-solid-svg-icons";
+import {AuthService} from "../service/AuthService.ts";
+// import { AuthService } from "../service/AuthService.ts";
 
 export class Header extends BaseComponent {
 
@@ -10,6 +14,8 @@ export class Header extends BaseComponent {
     declare context: React.ContextType<typeof UserContext>;
 
     render() {
+
+        const { isLoggedIn, user, logout } = this.context;
 
         return (
             <nav className="navbar">
@@ -30,26 +36,26 @@ export class Header extends BaseComponent {
                         <a>Eventos</a>
                     </div>
 
-                    {/*<div className="nav-actions">*/}
-                    {/*    {isLoggedIn ? (*/}
-                    {/*        <div className="user-menu">*/}
-                    {/*            <a href={`${AUTH_URL}/account`} className="user-profile-link">*/}
-                    {/*                <span className="username">{user?.username}</span>*/}
-                    {/*                {user?.avatarPath ? (*/}
-                    {/*                    <img src={user.avatarPath} alt="Avatar" className="user-avatar" />*/}
-                    {/*                ) : (*/}
-                    {/*                    <FontAwesomeIcon icon={faUser} className="user-icon" />*/}
-                    {/*                )}*/}
-                    {/*            </a>*/}
-                    {/*            <FontAwesomeIcon onClick={logout} icon={faRightFromBracket} />*/}
-                    {/*        </div>*/}
-                    {/*    ) : (*/}
-                    {/*        <a href={AuthService.getLoginUrl()} className="login-link">*/}
-                    {/*            <FontAwesomeIcon icon={faArrowRightToBracket} />*/}
-                    {/*            <span style={{marginLeft: '5px'}}>Entrar</span>*/}
-                    {/*        </a>*/}
-                    {/*    )}*/}
-                    {/*</div>*/}
+                    <div className="nav-actions">
+                        {isLoggedIn ? (
+                            <div className="user-menu">
+                                <a href={`${AUTH_URL}/account`} className="user-profile-link">
+                                    <span className="username">{user?.username}</span>
+                                    {user?.avatarPath ? (
+                                        <img src={user.avatarPath} alt="Avatar" className="user-avatar" />
+                                    ) : (
+                                        <FontAwesomeIcon icon={faUser} className="user-icon" />
+                                    )}
+                                </a>
+                                <FontAwesomeIcon onClick={logout} icon={faRightFromBracket} />
+                            </div>
+                        ) : (
+                            <a href={AuthService.getLoginUrl()} className="login-link">
+                                <FontAwesomeIcon icon={faArrowRightToBracket} />
+                                <span style={{marginLeft: '5px'}}>Entrar</span>
+                            </a>
+                        )}
+                    </div>
                 </div>
                 {/* ${this.state.menuOpen ? 'open' : ''}*/}
             </nav>

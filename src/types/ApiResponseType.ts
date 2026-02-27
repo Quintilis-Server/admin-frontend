@@ -6,6 +6,12 @@ export interface ApiResponseType<T = null> {
     timestamp: Date;
 }
 
+export interface PageResponse<T> {
+    items: T[],
+    totalPages: number,
+    currentPage: number
+}
+
 export const ErrorCode = {
     NOT_FOUND: 'NOT_FOUND',
     BAD_REQUEST: 'BAD_REQUEST',

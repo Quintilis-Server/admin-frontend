@@ -1,11 +1,18 @@
 import {BaseHomePage, type BaseHomeState} from "../../BaseHomePage.tsx";
 import type {BaseProps} from "../../../types/PageTypes.ts";
 import type {Category} from "../../../types/ForumTypes.ts";
-import HomeListComponent from "../../../components/HomeListComponent.tsx";
+import {API_FORUM_ROUTES} from "../../../Consts.ts";
 
-export class CategoryHomePage extends BaseHomePage<BaseProps, BaseHomeState<Category>, Category> {
+export class CategoryHomePage extends BaseHomePage<Category, BaseProps, BaseHomeState<Category>> {
+    protected getSearchableText(item: Category): string {
+        return `${item.title} ${item.description} ${item.slug}`;
+    }
+    protected getItemLink(item: Category): string {
+        return `/forum/category/${item.id}`;
+    }
+
     protected getApiUrl(): string {
-        return "/forum/category/all"
+        return `${API_FORUM_ROUTES}/category/all`;
     }
     protected getPageTitle(): string {
         return "Categorias"
@@ -17,7 +24,17 @@ export class CategoryHomePage extends BaseHomePage<BaseProps, BaseHomeState<Cate
         return "Nova Categoria"
     }
     protected renderItem(item: Category): React.ReactNode {
-        return <HomeListComponent type={item} key={item.display_order}/>
+        return (
+            <>
+                <div>
+                    <h2>{item.title}</h2>
+                    <span>slug: {item.slug}</span>
+                </div>
+                <div>
+                    <p>{item.description}</p>
+                    <span>Tópicos: {item.topics.length}</span>
+                </div>
+            </>
+        )
     }
-
 }

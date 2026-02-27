@@ -12,13 +12,14 @@ export abstract class BaseCreationPage<
 > extends BaseFormPage<T, F, P, S> {
 
     protected abstract getResourceName(): string;
+    protected abstract getReturnURL(): string;
 
     protected async handleSubmit(): Promise<void> {
         const resource = this.getResourceName();
         try {
             this.setState(prevState => ({ ...prevState, loading: true }))
 
-            const response = await this.postToApi<T, T>(`${resource}/new`, this.state.formData);
+            const response = await this.post<T, T>(`${resource}/new`, this.state.formData);
 
             if(!response) {
                 throw new BaseException(ErrorCode.UNKNOWN_ERROR)
@@ -30,7 +31,7 @@ export abstract class BaseCreationPage<
 
             alert("CRIADO COM SUCESSO")
 
-            window.location.href = `/${resource}`
+            window.location.href = this.getReturnURL()
         }catch (e) {
             this.setState({
                 err: e instanceof BaseException ? e : new BaseException(ErrorCode.UNKNOWN_ERROR, "Erro desconhecido")

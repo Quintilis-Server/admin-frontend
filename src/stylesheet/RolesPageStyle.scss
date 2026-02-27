@@ -4,6 +4,11 @@
     width: 65em;
     max-width: 100%;
     border-radius: 10px;
+    margin-top: 3em;
+
+    &:first-child{
+        margin-top: 0;
+    }
 
     .page-header {
         display: flex;
@@ -83,6 +88,17 @@
         }
     }
 }
+//.role-badge {
+//    display: inline-flex;
+//    align-items: center;
+//    gap: 0.4em;
+//    padding: 0.3em 0.8em;
+//    border-radius: 20px;
+//    font-size: 0.85rem;
+//    font-weight: 600;
+//    color: #fff;
+//    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+//}
 
 .role-edit-page {
     padding: 2em;
@@ -276,6 +292,44 @@
         }
     }
 
+    .users-controls {
+        display: flex;
+        gap: 1em;
+        margin-top: 1em;
+
+        .search-input {
+            flex: 1;
+            padding: 0.8em 1em;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-size: 0.95rem;
+
+            &:focus {
+                outline: none;
+                border-color: var(--accent);
+                box-shadow: 0 0 0 2px var(--accent-glow);
+            }
+        }
+
+        .sort-select {
+            padding: 0.8em;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            cursor: pointer;
+
+            &:focus {
+                outline: none;
+                border-color: var(--accent);
+                box-shadow: 0 0 0 2px var(--accent-glow);
+            }
+        }
+    }
+
     .users-list {
         display: flex;
         flex-direction: column;
@@ -283,13 +337,13 @@
     }
 
     .user-card {
-        display: flex;
+        display: flex !important;
         align-items: center;
         gap: 1em;
         background: var(--bg-card);
         border: 1px solid var(--border);
         border-radius: 10px;
-        padding: 1em 1.5em;
+        padding: 1em 1.5em !important;
         transition: all var(--transition-fast);
         cursor: pointer;
         text-decoration: none;
@@ -378,42 +432,7 @@
         }
     }
 
-    .user-info-card {
-        background: var(--bg-card);
-        border: 1px solid var(--border);
-        border-radius: 10px;
-        padding: 1.5em;
-        margin-bottom: 2em;
-        display: flex;
-        align-items: center;
-        gap: 1em;
 
-        .user-avatar {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            background: var(--accent-glow);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            color: var(--accent);
-            font-size: 1.2rem;
-        }
-
-        .user-details {
-            .user-name {
-                font-size: 1.1rem;
-                color: var(--text-primary);
-                font-weight: 600;
-            }
-
-            .user-email {
-                font-size: 0.85rem;
-                color: var(--text-muted);
-            }
-        }
-    }
 
     .roles-selection {
         h2 {
@@ -539,6 +558,43 @@
         &:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+        }
+    }
+}
+
+.user-info-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.5em;
+    margin-bottom: 2em;
+    display: flex;
+    align-items: center;
+    gap: 1em;
+
+    .user-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: var(--accent-glow);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        color: var(--accent);
+        font-size: 1.2rem;
+    }
+
+    .user-details {
+        .user-name {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .user-email {
+            font-size: 0.85rem;
+            color: var(--text-muted);
         }
     }
 }

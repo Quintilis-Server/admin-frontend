@@ -5,7 +5,7 @@ export interface FormOption {
     value: string;
 }
 
-export type FieldType = 'text' | 'textarea' | 'date' | 'select' | 'readonly' | 'multiselect' | 'image' | "number";
+export type FieldType = 'text' | 'textarea' | 'date' | 'select' | 'readonly' | 'multiselect' | 'image' | "number" | "color";
 
 export interface FormField {
     label: string;

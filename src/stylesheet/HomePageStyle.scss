@@ -1,7 +1,7 @@
 .main-home{
     padding: 1em;
     background: var(--bg-secondary);
-    width: 65em;
+    //width: 65em;
     display: flex;
     align-items: center;
     flex-direction: column;
@@ -10,10 +10,16 @@
         align-items: center;
         flex-direction: column;
         gap:2em;
+        width: 100%;
     }
     border-radius: 10px;
 
-
+    .title{
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        padding: 1em;
+    }
     .buttons{
         display: flex;
         flex-direction: row;

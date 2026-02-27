@@ -194,6 +194,9 @@ export abstract class BaseFormPage<
                     case 'number':
                         inputElement = <input id={key as string} value={Number(value)} type={"number"} onChange={this.handleChange}/>
                         break
+                    case 'color':
+                        inputElement = <input id={key as string} value={value as string} onChange={this.handleChange} type="color"/>
+                        break
                     case 'text':
                     default:
                         inputElement = <input id={key as string} value={String(value)} onChange={this.handleChange} />;

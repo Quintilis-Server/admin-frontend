@@ -1,24 +1,31 @@
-import type {FormSchema, FormState} from "../../../types/FormOption.ts";
-import type {PageState} from "../../../types/PageTypes.ts";
-import {BaseCreationPage} from "../../BaseCreationPage.tsx";
+import type { FormSchema, FormState } from "../../../types/FormOption.ts";
+import type { PageState } from "../../../types/PageTypes.ts";
+import { BaseCreationPage } from "../../BaseCreationPage.tsx";
+import {API_FORUM_ROUTES, AUTH_URL} from "../../../Consts.ts";
+import type {Permission} from "../../../types/RoleTypes.ts";
 
 type CategoryData = {
     title: string,
     slug: string,
     description: string,
-    display_order: number
+    displayOrder: number,
+    permissions?: number
 }
 
 const CATEGORY_FORM_SCHEMA: FormSchema<CategoryData> = {
-    title: {label: "Titulo", type: "text"},
-    slug: {label: "Slug", type: "text"},
-    description: {label: "Descrição", type: "textarea"},
-    display_order: {label: "Ordem de mostragem", type: "number"}
+    title: { label: "Titulo", type: "text" },
+    slug: { label: "Slug", type: "text" },
+    description: { label: "Descrição", type: "textarea" },
+    displayOrder: { label: "Ordem de mostragem", type: "number" },
+    permissions: { label: "Permissão para Criar Tópico", type: "multiselect", options: [] }
 }
 
 export class CategoryCreationPage extends BaseCreationPage<CategoryData, typeof CATEGORY_FORM_SCHEMA, object, FormState<CategoryData>> {
+    protected getReturnURL(): string {
+        return "/forum/category"
+    }
     protected getResourceName(): string {
-        return "/forum/category";
+        return `${API_FORUM_ROUTES}/category`;
     }
 
     protected getFormSchema(): typeof CATEGORY_FORM_SCHEMA {
@@ -30,10 +37,32 @@ export class CategoryCreationPage extends BaseCreationPage<CategoryData, typeof 
             title: "",
             slug: "",
             description: "",
-            display_order: 0
+            displayOrder: 0
         },
         title: "Nova Categoria",
         err: undefined,
         loading: false
+    }
+
+    async componentDidMount() {
+        try {
+            const response = await this.get<Permission[]>(`${AUTH_URL}/auth/permissions/all`);
+            if (response && response.data && response.data.success) {
+                const permissions = response.data.data;
+                const options = [
+                    { label: "Nenhuma (Público)", value: "" },
+                    ...permissions.map((p: Permission) => ({
+                        label: p.name,
+                        value: String(p.id)
+                    }))
+                ];
+
+                // Hack: Modifying schema options dynamically
+                CATEGORY_FORM_SCHEMA.permissions!.options = options;
+                this.forceUpdate();
+            }
+        } catch (e) {
+            console.error("Failed to load permissions", e);
+        }
     }
 }

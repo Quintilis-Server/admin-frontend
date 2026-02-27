@@ -1,7 +1,7 @@
-import {BasePage} from "../BasePage.tsx";
-import type {BaseProps, PageState} from "../../types/PageTypes.ts";
+import {BasePage} from "../../BasePage.tsx";
+import type {BaseProps, PageState} from "../../../types/PageTypes.ts";
 import * as React from "react";
-import "../../stylesheet/HomePageStyle.scss"
+import "../../../stylesheet/HomePageStyle.scss"
 
 export class ForumHomePage extends BasePage<BaseProps, PageState> {
     protected renderContent(): React.ReactNode {
