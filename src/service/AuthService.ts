@@ -15,6 +15,8 @@ export class AuthService {
     private static readonly CLIENT_SECRET = "secret-admin"; // Atualizado conforme application.yml
     private static readonly REDIRECT_URI = window.location.origin + "/authorized"; // Atualizado conforme application.yml
 
+    private static processingCodes = new Set<string>();
+
     static getLoginUrl(returnTo?: string): string {
         const params = new URLSearchParams();
         params.append('response_type', 'code');
@@ -29,20 +31,22 @@ export class AuthService {
     }
 
     static async handleCallback(code: string): Promise<boolean> {
+        if (this.processingCodes.has(code)) {
+            console.log("🔥 IGNORANDO REQUISIÇÃO DUPLICADA DO REACT STRICT MODE!");
+            return false;
+        }
+        this.processingCodes.add(code);
         try {
             const params = new URLSearchParams();
             params.append('grant_type', 'authorization_code');
             params.append('code', code);
             params.append('redirect_uri', this.REDIRECT_URI);
-            // params.append('client_id', this.CLIENT_ID); // Authorization Code Flow com Basic Auth no header não precisa disso no body se usar header
-            // params.append('client_secret', this.CLIENT_SECRET);
 
-            // Basic Auth header com client_id e client_secret
             const authHeader = 'Basic ' + btoa(`${this.CLIENT_ID}:${this.CLIENT_SECRET}`);
 
             const response = await axios.post<OAuth2TokenResponse>(
                 `${API_OAUTH2_ROUTES}/token`,
-                params,
+                params.toString(), // <--- MUDE AQUI! Adicione .toString()
                 {
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
@@ -50,6 +54,8 @@ export class AuthService {
                     }
                 }
             );
+            console.log("🔥 STATUS DA RESPOSTA:", response.status);
+            console.log("🔥 DADOS DA RESPOSTA:", response.data);
 
             if (response.data && response.data.access_token) {
                 this.saveTokens(response.data);
@@ -188,7 +194,7 @@ export class AuthService {
 
     static isAuthenticated(): boolean {
         const token = this.getAccessToken();
-        console.log(token)
+        // console.log(token)
         if (!token) return false;
 
         const expiresAt = localStorage.getItem("expiresAt");

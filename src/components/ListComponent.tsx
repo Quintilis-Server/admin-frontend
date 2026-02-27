@@ -54,7 +54,9 @@ export class ListComponent<T extends object, R extends object> extends BaseCompo
 
     private fetchData = async (page: number) =>{
         await this.executeAsync(async ()=>{
-            const url = `${this.props.apiUrl}${this.props.withPage ? `?page=${page}` : ''}`
+            const url = new URL(this.props.apiUrl)
+            if(this.props.withPage) url.searchParams.set("page", page.toString())
+            if(this.state.sortField) url.searchParams.append("sort", this.state.sortField)
             const result = await this.get<R>(url)
             if (result && result.data.success) {
                 const pageData = result.data.data as any;
@@ -91,7 +93,7 @@ export class ListComponent<T extends object, R extends object> extends BaseCompo
         });
     }
 
-    private handleSort = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    private handleSort = async (e: React.ChangeEvent<HTMLSelectElement>) => {
         const field = e.target.value;
 
         if (!field) {
@@ -99,23 +101,27 @@ export class ListComponent<T extends object, R extends object> extends BaseCompo
             return;
         }
 
-        const { items, sortDirection } = this.state;
-        const getSortValue = this.props.getSortValue ?? ((item: T, f: string) => (item as Record<string, any>)[f] ?? "");
+        this.setState({sortField: field})
 
-        const sorted = [...items].sort((a, b) => {
-            const aVal = getSortValue(a, field);
-            const bVal = getSortValue(b, field);
-
-            // Lógica de comparação genérica
-            if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1;
-            if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
-            return 0;
-        });
-
-        this.setState({
-            sortField: field,
-            items: sorted,
-        });
+        await this.fetchData(this.state.currentPage)
+        //
+        // const { items, sortDirection } = this.state;
+        // const getSortValue = this.props.getSortValue ?? ((item: T, f: string) => (item as Record<string, any>)[f] ?? "");
+        //
+        // const sorted = [...items].sort((a, b) => {
+        //     const aVal = getSortValue(a, field);
+        //     const bVal = getSortValue(b, field);
+        //
+        //     // Lógica de comparação genérica
+        //     if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1;
+        //     if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
+        //     return 0;
+        // });
+        //
+        // this.setState({
+        //     sortField: field,
+        //     items: sorted,
+        // });
     }
 
     private toggleSortDirection = () => {
