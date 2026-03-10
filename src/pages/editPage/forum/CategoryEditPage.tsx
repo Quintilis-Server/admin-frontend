@@ -15,11 +15,11 @@ type CategoryData = {
 }
 
 const CATEGORY_FORM_SCHEMA: FormSchema<CategoryData> = {
-    title: { label: "Titulo", type: "text" },
-    slug: { label: "Slug", type: "text" },
-    description: { label: "Descrição", type: "textarea" },
-    displayOrder: { label: "Ordem de mostragem", type: "number" },
-    permissions: { label: "Permissões para Criar Tópico", type: "multiselect", options: [] }
+    title: { label: "Titulo", type: "text", readonly: false },
+    slug: { label: "Slug", type: "text", readonly: false },
+    description: { label: "Descrição", type: "textarea", readonly: false },
+    displayOrder: { label: "Ordem de mostragem", type: "number", readonly: false },
+    permissions: { label: "Permissões para Criar Tópico", type: "multiselect", readonly: false, options: [] }
 }
 
 export class CategoryEditPage extends BaseEditPage<CategoryData, typeof CATEGORY_FORM_SCHEMA> {
@@ -39,11 +39,11 @@ export class CategoryEditPage extends BaseEditPage<CategoryData, typeof CATEGORY
     }
 
     protected getResourceName(): string {
-        return `${API_FORUM_ROUTES}/category`;
+        return `${API_FORUM_ROUTES}/categories`;
     }
 
     protected getReturnURL(): string {
-        return "/forum/category"
+        return "/forum/categories"
     }
 
     protected getFormSchema(): typeof CATEGORY_FORM_SCHEMA {
@@ -54,25 +54,11 @@ export class CategoryEditPage extends BaseEditPage<CategoryData, typeof CATEGORY
         await super.fetchDataToEdit();
 
         // 2. Transforma o Permission[] em string[] com os IDs
-        this.setState(prevState => {
-            const formData = prevState.formData as any; // Fazemos um cast rápido para acessar os dados crus
-
-            if (formData && Array.isArray(formData.permissions)) {
-                return {
-                    ...prevState,
-                    formData: {
-                        ...prevState.formData,
-                        // Mapeia o array de objetos pegando apenas o ID convertido para string
-                        permissions: formData.permissions.map((p: Permission) => String(p.id))
-                    }
-                };
-            }
-            return prevState;
-        });
+        super.handlePermissions()
     }
 
     async componentDidMount() {
-        super.componentDidMount();
+        await super.componentDidMount();
         try {
             const response = await this.get<Permission[]>(`${AUTH_URL}/auth/permissions/all`);
             if (response && response.data && response.data.success) {

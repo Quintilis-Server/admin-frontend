@@ -33,6 +33,7 @@ export class Header extends BaseComponent {
                         <a href="/forum">Forum</a>
                         <a href="/roles">Roles</a>
                         <a href="/users">Users</a>
+                        <a href="/routes">Permissões<br/> de rotas</a>
                         <a>Eventos</a>
                     </div>
 

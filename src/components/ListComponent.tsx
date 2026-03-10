@@ -1,29 +1,30 @@
 import * as React from "react";
 import "../stylesheet/ListComponentStyle.scss"
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faMagnifyingGlass} from "@fortawesome/free-solid-svg-icons";
-import {BaseComponent} from "./BaseComponent.tsx";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
+import { BaseComponent } from "./BaseComponent.tsx";
+import type { PageResponse } from "../types/ApiResponseType.ts";
 
-export type SortOption = {
+export type SortOption<T> = {
     label: string;
-    field: string;
+    field: Extract<keyof T, string>;
 }
 
 export type ListComponentProps<T> = {
-    apiUrl: string; // O componente agora sabe onde buscar os dados
+    apiUrl: string;
     renderItem: (item: T) => React.ReactNode;
     getItemLink: (item: T) => string;
     getSearchableText: (item: T) => string;
     withPage?: boolean;
-    sortOptions?: SortOption[];
+    sortOptions?: SortOption<T>[];
     getSortValue?: (item: T, field: string) => string | number;
     className?: string;
     itemClassName?: string;
 }
 
 type ListState<T> = {
-    originalItems: T[];   // Itens originais, para restaurar a busca
-    items: T[];           // Itens vindos do servidor
+    originalItems: T[];
+    items: T[];
     loading: boolean;
     currentPage: number;
     totalPages: number;
@@ -33,6 +34,9 @@ type ListState<T> = {
 }
 
 export class ListComponent<T extends object, R extends object> extends BaseComponent<ListComponentProps<T>, ListState<T>> {
+
+    private searchTimeout?: ReturnType<typeof setTimeout>;
+
     constructor(props: ListComponentProps<T>) {
         super(props);
         this.state = {
@@ -47,107 +51,147 @@ export class ListComponent<T extends object, R extends object> extends BaseCompo
         } as ListState<T>;
     }
 
+    // 1. CARREGA OS DADOS ANTES DE FAZER O FETCH INICIAL
     async componentDidMount() {
-        // console.log(this.props.withPage)
-        await this.fetchData(1);
+        const restoredState = this.loadFromSessionStorage();
+
+        // Atualiza o state com o que tinha no storage e SÓ ENTÃO faz o fetch
+        this.setState(restoredState, async () => {
+            await this.fetchData(this.state.currentPage);
+        });
     }
 
-    private fetchData = async (page: number) =>{
-        await this.executeAsync(async ()=>{
-            const url = new URL(this.props.apiUrl)
-            if(this.props.withPage) url.searchParams.set("page", page.toString())
-            if(this.state.sortField) url.searchParams.append("sort", this.state.sortField)
-            const result = await this.get<R>(url)
-            if (result && result.data.success) {
-                const pageData = result.data.data as any;
+    // 2. SALVA AUTOMATICAMENTE QUALQUER MUDANÇA (Magia do React)
+    componentDidUpdate(_prevProps: ListComponentProps<T>, prevState: ListState<T>) {
+        // Se qualquer um desses campos mudou de valor, salva no storage!
+        if (
+            prevState.searchQuery !== this.state.searchQuery ||
+            prevState.sortField !== this.state.sortField ||
+            prevState.sortDirection !== this.state.sortDirection ||
+            prevState.currentPage !== this.state.currentPage
+        ) {
+            this.saveToSessionStorage();
+        }
+    }
 
-                // Verifica se é um objeto e se possui a lista de 'items' (Duck Typing)
-                if (pageData && typeof pageData === 'object' && 'items' in pageData) {
+    // 🔥 Trocamos Partial por Pick, listando exatamente o que estamos devolvendo!
+    private loadFromSessionStorage = (): Pick<ListState<T>, 'searchQuery' | 'sortField' | 'sortDirection' | 'currentPage'> => {
+        const prefix = this.props.apiUrl;
+        const search = sessionStorage.getItem(`${prefix}_search`);
+        const sortField = sessionStorage.getItem(`${prefix}_sortField`);
+        const sortDirection = sessionStorage.getItem(`${prefix}_sortDirection`);
+        const pageStr = sessionStorage.getItem(`${prefix}_page`);
+
+        const page = pageStr ? parseInt(pageStr, 10) : 1;
+
+        return {
+            searchQuery: search ?? "",
+            sortField: sortField ?? "",
+            sortDirection: (sortDirection === 'desc' ? 'desc' : 'asc'),
+            currentPage: isNaN(page) ? 1 : page
+        };
+    }
+
+    private saveToSessionStorage = () => {
+        const prefix = this.props.apiUrl;
+        sessionStorage.setItem(`${prefix}_search`, this.state.searchQuery);
+        sessionStorage.setItem(`${prefix}_sortField`, this.state.sortField); // Corrigido aqui (estava salvando sortDirection no lugar do sortField antes)
+        sessionStorage.setItem(`${prefix}_sortDirection`, this.state.sortDirection);
+        sessionStorage.setItem(`${prefix}_page`, this.state.currentPage.toString());
+    }
+
+    private isPageResponse(data: any): data is PageResponse<T> {
+        return data && typeof data === 'object' && 'content' in data && 'totalPages' in data;
+    }
+
+    private fetchData = async (page: number) => {
+        await this.executeAsync(async () => {
+            const url = new URL(this.props.apiUrl);
+
+            if (this.props.withPage) url.searchParams.set("page", (page - 1).toString());
+
+            if (this.state.sortField) {
+                url.searchParams.append("sort", `${this.state.sortField},${this.state.sortDirection}`);
+            }
+
+            if (this.state.searchQuery.trim()) {
+                url.searchParams.append("search", this.state.searchQuery.trim());
+            }
+
+            const result = await this.get<R>(url);
+
+            if (result && result.data.success) {
+                const payload = result.data.data;
+
+                if (this.isPageResponse(payload)) {
                     this.setState({
-                        originalItems: pageData.items,
-                        items: pageData.items,
-                        totalPages: pageData.totalPages,
-                        currentPage: pageData.currentPage
-                    })
-                } else {
+                        originalItems: payload.content,
+                        items: payload.content,
+                        totalPages: payload.totalPages,
+                        currentPage: payload.number + 1
+                    });
+                } else if (Array.isArray(payload)) {
                     this.setState({
-                        originalItems: pageData,
-                        items: pageData
-                    })
+                        originalItems: payload,
+                        items: payload,
+                        totalPages: 1,
+                        currentPage: 1
+                    });
                 }
             }
-        })
+        });
     }
 
     private handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         const query = e.target.value;
-        const filtered = query.trim()
-            ? this.state.originalItems.filter(item =>
-                this.props.getSearchableText(item).toLowerCase().includes(query.toLowerCase())
-            )
-            : [...this.state.originalItems];
 
-        this.setState({
-            searchQuery: query,
-            items: filtered,
+        this.setState({ searchQuery: query }, () => {
+            if (this.props.withPage) {
+                if (this.searchTimeout) {
+                    clearTimeout(this.searchTimeout);
+                }
+
+                this.searchTimeout = setTimeout(() => {
+                    this.fetchData(1);
+                }, 500);
+
+            } else {
+                const filtered = query.trim()
+                    ? this.state.originalItems.filter(item =>
+                        this.props.getSearchableText(item).toLowerCase().includes(query.toLowerCase())
+                    )
+                    : [...this.state.originalItems];
+
+                this.setState({ items: filtered });
+            }
         });
     }
 
     private handleSort = async (e: React.ChangeEvent<HTMLSelectElement>) => {
         const field = e.target.value;
-
-        if (!field) {
-            this.setState({ sortField: "" });
-            return;
-        }
-
-        this.setState({sortField: field})
-
-        await this.fetchData(this.state.currentPage)
-        //
-        // const { items, sortDirection } = this.state;
-        // const getSortValue = this.props.getSortValue ?? ((item: T, f: string) => (item as Record<string, any>)[f] ?? "");
-        //
-        // const sorted = [...items].sort((a, b) => {
-        //     const aVal = getSortValue(a, field);
-        //     const bVal = getSortValue(b, field);
-        //
-        //     // Lógica de comparação genérica
-        //     if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1;
-        //     if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
-        //     return 0;
-        // });
-        //
-        // this.setState({
-        //     sortField: field,
-        //     items: sorted,
-        // });
+        this.setState({ sortField: field ?? "" }, async () => {
+            await this.fetchData(this.state.currentPage);
+        });
     }
 
     private toggleSortDirection = () => {
         const newDir = this.state.sortDirection === 'asc' ? 'desc' : 'asc';
-        const sorted = [...this.state.items].reverse();
-
-        this.setState({
-            sortDirection: newDir,
-            items: sorted,
+        this.setState({ sortDirection: newDir }, async () => {
+            await this.fetchData(this.state.currentPage);
         });
     }
 
     private handlePageChange = async (page: number) => {
-        // this.setState({ currentPage: page });
         await this.fetchData(page);
-        // Scroll para o topo da lista se desejar
-        // window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     render() {
         const { sortOptions = [], className, itemClassName } = this.props;
-        // Pega tudo do STATE, pois o componente agora é autônomo
         const { items, searchQuery, sortField, sortDirection, currentPage, totalPages } = this.state;
 
         return (
             <div className="list-container">
+                {/* O seu JSX continua intacto aqui... */}
                 <div className="list-toolbar">
                     <div className="search-bar">
                         <FontAwesomeIcon className={"search-icon"} icon={faMagnifyingGlass}/>
@@ -184,7 +228,7 @@ export class ListComponent<T extends object, R extends object> extends BaseCompo
                 <div className={`list ${className ? className : ""}`}>
                     {items.length > 0 ? (
                         items.map((item, index) => (
-                                <a href={this.props.getItemLink(item)} className={`list-item ${itemClassName ? itemClassName : ""}`} key={index}>
+                            <a href={this.props.getItemLink(item)} className={`list-item ${itemClassName ? itemClassName : ""}`} key={index}>
                                 {this.props.renderItem(item)}
                             </a>
                         ))

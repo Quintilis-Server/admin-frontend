@@ -11,19 +11,24 @@ type RoleEditData = {
     displayName: string;
     color: string;
     priority: number;
-    permissionIds: string[]; // Usado para o multiselect
+    permissions: Permission[]; // Usado para o multiselect
+    icon: string;
 }
 
 const ROLE_FORM_SCHEMA: FormSchema<RoleEditData> = {
-    id: { type: 'readonly', label: 'ID' },
-    name: { type: 'text', label: 'Nome Interno' },
-    displayName: { type: 'text', label: 'Nome de Exibição' },
-    color: { type: 'color', label: 'Cor (Hex)' },
-    priority: { type: 'number', label: 'Prioridade' },
-    permissionIds: { type: 'multiselect', label: 'Permissões', options: [] }
+    id: { type: 'text', label: 'ID', readonly: true },
+    name: { type: 'text', label: 'Nome Interno', readonly: false },
+    displayName: { type: 'text', label: 'Nome de Exibição', readonly: false },
+    color: { type: 'color', label: 'Cor (Hex)', readonly: false },
+    priority: { type: 'number', label: 'Prioridade', readonly: false },
+    permissions: { type: 'multiselect', label: 'Permissões', readonly: false, options: [] },
+    icon: {type: 'icon', label: 'Icone', readonly: false},
 }
 
 export class RoleEditPage extends BaseEditPage<RoleEditData, typeof ROLE_FORM_SCHEMA> {
+    protected getReturnURL(): string {
+        return "/roles"
+    }
 
     constructor(props: EditPageProps) {
         super(props, {
@@ -33,7 +38,8 @@ export class RoleEditPage extends BaseEditPage<RoleEditData, typeof ROLE_FORM_SC
                 displayName: "",
                 color: "",
                 priority: 0,
-                permissionIds: []
+                permissions: [],
+                icon: ""
             },
             title: "Editar Role",
             err: undefined,
@@ -42,7 +48,7 @@ export class RoleEditPage extends BaseEditPage<RoleEditData, typeof ROLE_FORM_SC
     }
 
     protected getResourceName(): string {
-        return "auth/role";
+        return "role";
     }
 
     protected getFormSchema(): typeof ROLE_FORM_SCHEMA {
@@ -56,11 +62,11 @@ export class RoleEditPage extends BaseEditPage<RoleEditData, typeof ROLE_FORM_SC
     protected async fetchDataToEdit() {
         const id = this.props.params.id;
         if (!id) return;
-        this.executeAsync(async ()=>{
+        await this.executeAsync(async () => {
             try {
                 const [roleRes, permsRes] = await Promise.all([
-                    this.get<Role>(`${AUTH_URL}/auth/roles/${id}`),
-                    this.get<Permission[]>(`${AUTH_URL}/auth/permissions/all`)
+                    this.get<Role>(`${AUTH_URL}/roles/${id}`),
+                    this.get<Permission[]>(`${AUTH_URL}/permissions/list`)
                 ]);
 
                 const roleData = roleRes.data;
@@ -74,16 +80,10 @@ export class RoleEditPage extends BaseEditPage<RoleEditData, typeof ROLE_FORM_SC
                 const allPerms = permsData.data as unknown as Permission[];
 
                 const schema = this.getFormSchema();
-                schema.permissionIds.options = allPerms.map(p => ({
+                schema.permissions.options = allPerms.map(p => ({
                     label: p.name + (p.description ? ` - ${p.description}` : ""),
                     value: String(p.id)
                 }));
-
-                // Map das permissões da Role (string) para os IDs
-                const permissionIds = role.permissions.map(permName => {
-                    const p = allPerms.find(ap => ap.name === permName);
-                    return p ? String(p.id) : null;
-                }).filter(id => id !== null) as string[];
 
                 this.setState(prevState => ({
                     ...prevState,
@@ -93,7 +93,8 @@ export class RoleEditPage extends BaseEditPage<RoleEditData, typeof ROLE_FORM_SC
                         displayName: role.displayName,
                         color: role.color,
                         priority: role.priority,
-                        permissionIds
+                        permissions: role.permissions,
+                        icon: role.icon,
                     },
                     loading: false,
                     title: `Editar Role - ${role.displayName}`
@@ -115,10 +116,27 @@ export class RoleEditPage extends BaseEditPage<RoleEditData, typeof ROLE_FORM_SC
         this.setState({ loading: true, err: undefined });
 
         try {
-            const role: RoleEditData = this.state.formData
-            role.permissionIds = this.state.formData.permissionIds.map(String);
-            console.log(role)
-            await this.put<Role, RoleEditData>(`${AUTH_URL}/auth/roles/${id}`, role)
+            const payloadParaOBackend = {
+                ...this.state.formData,
+            }
+
+            payloadParaOBackend.permissions = this.state.formData.permissions.map((perm: any) => {
+                if (typeof perm === "string" || typeof perm === "number") {
+                    return {
+                        id: parseInt(String(perm), 10),
+                        name: "",
+                        description: ""
+                    }
+                }
+
+                return {
+                    id: perm.id,
+                    name: perm.name || "",
+                    description: perm.description || ""
+                }
+            }) as unknown as Permission[];
+
+            await this.post<Role, RoleEditData>(`${AUTH_URL}/roles/${id}/update`, payloadParaOBackend);
             // await axios.put(
             //     `${AUTH_URL}/auth/roles/${id}/permissions`,
             //     permissionIds,

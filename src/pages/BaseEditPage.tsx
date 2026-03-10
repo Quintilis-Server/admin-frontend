@@ -41,7 +41,7 @@ export abstract class BaseEditPage<
             return;
         }
         try {
-            const response = await this.get<T>(`${resource}/${id}`)
+            const response = await this.get<T>(`${resource}/${id}/with-inactive`)
             if (response && response.data) {
                 this.setState(prevState => ({
                     ...prevState,
@@ -80,12 +80,13 @@ export abstract class BaseEditPage<
         if (!confirm("Tem certeza que deseja deletar este item?")) return
 
         try {
+            //TODO trocar de post para DELETE
             const response = await this.post<null, null>(`${this.getResourceName()}/${id}/delete`, null)
 
             if (!response || !response.data || !response.data.success) throw BaseException.fromResponse(response.data)
 
             alert("Deletado com sucesso")
-            window.location.href = `${this.getReturnURL()}`
+            window.location.href = this.getReturnURL()
         } catch (e) {
             console.log()
             this.setState({
@@ -100,7 +101,7 @@ export abstract class BaseEditPage<
         if (!id) return;
 
         try {
-            const response = await this.put<T, T>(`${this.getResourceName()}/${id}/update`, this.state.formData);
+            const response = await this.post<T, T>(`${this.getResourceName()}/${id}/update`, this.state.formData);
             if (!response || !response.data || !response.data.success) throw BaseException.fromResponse<T>(response.data)
 
             alert("Atualizado com sucesso!")

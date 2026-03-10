@@ -26,12 +26,13 @@ export class RolesHomePage extends BasePage<BaseProps, RolesHomeState> {
     async componentDidMount() {
         super.componentDidMount();
         try {
-            const roles = await this.get<Role[]>(`${AUTH_URL}/auth/roles`);
-            const permission = await this.get<Permission[]>(`${AUTH_URL}/auth/permissions`)
+            const roles = await this.get<PageResponse<Role>>(`${AUTH_URL}/roles/all/with-inactive`);
+            const permission = await this.get<PageResponse<Permission>>(`${AUTH_URL}/permissions/all/with-inactive`)
             if (roles && roles.data && permission && permission.data) {
+                const rolesSorted = roles.data.data.content.sort((a, b) => b.priority - a.priority);
                 this.setState({
-                    roles: roles.data.data,
-                    permissions: permission.data.data,
+                    roles: rolesSorted,
+                    permissions: permission.data.data.content,
                     loading: false
                 });
             }
@@ -72,7 +73,7 @@ export class RolesHomePage extends BasePage<BaseProps, RolesHomeState> {
                             <a key={role.id} className="role-card" href={`/roles/${role.id}`}>
                                 <div className="role-card-header">
                                     <span className="role-badge" style={{ backgroundColor: role.color }}>
-                                        {role.icon && <span>{role.icon}</span>}
+                                        {role.icon && <i className={role.icon} style={{ marginRight: '8px' }}></i>}
                                         {role.name}
                                     </span>
                                     <span className="role-priority">Prioridade: {role.priority}</span>
@@ -96,12 +97,10 @@ export class RolesHomePage extends BasePage<BaseProps, RolesHomeState> {
                         renderItem={(item) => this.renderPermission(item)}
                         getItemLink={(item) => `/permission/${item.id}`}
                         getSearchableText={(item) => `${item.id} ${item.name} ${item.description}`}
-                        
                         sortOptions={[
                             {label: "Nome", field: "name"},
-                            {label: "Descrição", field: "description"},
                             {label: "Id", field: "id"}
-                        ]} apiUrl={`${AUTH_URL}/auth/permissions`}
+                        ]} apiUrl={`${AUTH_URL}/permissions/all/with-inactive`}
                         withPage={true}
                     />
                 </div>

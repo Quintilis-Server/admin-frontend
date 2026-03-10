@@ -13,19 +13,19 @@ type CategoryData = {
 }
 
 const CATEGORY_FORM_SCHEMA: FormSchema<CategoryData> = {
-    title: { label: "Titulo", type: "text" },
-    slug: { label: "Slug", type: "text" },
-    description: { label: "Descrição", type: "textarea" },
-    displayOrder: { label: "Ordem de mostragem", type: "number" },
-    permissions: { label: "Permissão para Criar Tópico", type: "multiselect", options: [] }
+    title: { label: "Titulo", type: "text", readonly: false },
+    slug: { label: "Slug", type: "text", readonly: false },
+    description: { label: "Descrição", type: "textarea", readonly: false },
+    displayOrder: { label: "Ordem de mostragem", type: "number", readonly: false },
+    permissions: { label: "Permissão para Criar Tópico", type: "multiselect", readonly: false, options: [] }
 }
 
 export class CategoryCreationPage extends BaseCreationPage<CategoryData, typeof CATEGORY_FORM_SCHEMA, object, FormState<CategoryData>> {
     protected getReturnURL(): string {
-        return "/forum/category"
+        return "/forum/categories"
     }
     protected getResourceName(): string {
-        return `${API_FORUM_ROUTES}/category`;
+        return `${API_FORUM_ROUTES}/categories`;
     }
 
     protected getFormSchema(): typeof CATEGORY_FORM_SCHEMA {

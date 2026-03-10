@@ -1,9 +1,13 @@
 import type {FormSchema, FormState} from "../types/FormOption.ts";
 import type {BaseProps} from "../types/PageTypes.ts";
 import {BasePage} from "./BasePage.tsx";
-import type {ChangeEvent, JSX} from "react";
+import  {type ChangeEvent, type JSX} from "react";
 import {API_URL} from "../Consts.ts";
 import "../stylesheet/FormStyle.scss"
+import type {Permission} from "../types/RoleTypes.ts";
+import * as React from "react";
+import {MultiSelect} from "../components/MultiSelect.tsx";
+import {IconInput} from "../components/IconInput.tsx";
 
 export abstract class BaseFormPage<
     T extends object,
@@ -36,22 +40,11 @@ export abstract class BaseFormPage<
         }));
     }
 
-    protected handleMultiSelectChange = (e: ChangeEvent<HTMLSelectElement>) => {
-        const { id, options } = e.target;
-        const selectedValues: string[] = [];
-
-        // Percorre as opções e pega todas que estão selecionadas
-        for (let i = 0; i < options.length; i++) {
-            if (options[i].selected) {
-                selectedValues.push(options[i].value);
-            }
-        }
-
+    protected handleMultiSelectChange = (id: string, selectedValues: string[]) => {
         this.setState(prevState => ({
-            ...prevState,
             formData: {
                 ...prevState.formData,
-                [id]: selectedValues // Salva como Array de strings
+                [id]: selectedValues // Salva o array de strings limpinho
             }
         }));
     }
@@ -73,7 +66,6 @@ export abstract class BaseFormPage<
             const formData = new FormData();
             formData.append('file', file);
 
-            //TODO colocar o metodo real aq para post para a API logada
             const response = await this.post<any, FormData>(`/images/upload?folder=nominees`, formData, {
                 'Content-Type': 'multipart/form-data'
             });
@@ -101,6 +93,24 @@ export abstract class BaseFormPage<
         }
     }
 
+    protected handlePermissions(){
+        this.setState(prevState => {
+            const formData = prevState.formData as any; // Fazemos um cast rápido para acessar os dados crus
+
+            if (formData && Array.isArray(formData.permissions)) {
+                return {
+                    ...prevState,
+                    formData: {
+                        ...prevState.formData,
+                        // Mapeia o array de objetos pegando apenas o ID convertido para string
+                        permissions: formData.permissions.map((p: Permission) => String(p.id))
+                    }
+                };
+            }
+            return prevState;
+        });
+    }
+
     protected renderForm(schema: F): React.ReactNode {
         if (!this.state.formData) {
             return null
@@ -113,33 +123,53 @@ export abstract class BaseFormPage<
             let inputElement: JSX.Element;
 
             if (field) {
+                const isReadonly = field.readonly || false;
+                const disabledClass = isReadonly ? "disabled" : "";
                 switch (field.type) {
                     case 'textarea':
-                        inputElement = <textarea id={key as string} value={String(value)} onChange={this.handleChange} />
+                        inputElement = <textarea
+                            id={key as string}
+                            value={String(value)}
+                            onChange={this.handleChange}
+                            disabled={isReadonly}
+                            className={disabledClass}
+                        />
                         break
                     case 'select':
                         inputElement = (
-                            <select id={key as string} value={String(value)} onChange={this.handleChange}>
-                                <option value="" disabled>Selecione...</option>
+                            <select
+                                id={key as string}
+                                value={String(value)}
+                                onChange={this.handleChange}
+                                disabled={isReadonly}
+                                className={disabledClass}
+                            >
+                                <option
+                                    value=""
+                                    disabled
+                                >
+                                    Selecione...
+                                </option>
                                 {field.options?.map(option => (
-                                    <option key={option.value} value={option.value}>{option.label}</option>
+                                    <option
+                                        key={option.value}
+                                        value={option.value}
+                                    >
+                                        {option.label}
+                                    </option>
                                 ))}
                             </select>
                         );
                         break;
                     case 'date':
-                        inputElement = <input id={key as string} value={String(value)} type="date" onChange={this.handleChange} />;
-                        break;
-                    case 'readonly':
-                        inputElement = (
-                            <input
-                                id={key as string}
-                                value={String(value)}
-                                type="text"
-                                disabled
-                                style={{ backgroundColor: "#e9ecef", cursor: "not-allowed", color: '#6c757d' }}
-                            />
-                        )
+                        inputElement = <input
+                            id={key as string}
+                            value={String(value)}
+                            type="date"
+                            onChange={this.handleChange}
+                            disabled={isReadonly}
+                            className={disabledClass}
+                        />;
                         break;
                     case 'multiselect':
                         // Garante que o value seja um array para o React não reclamar
@@ -147,19 +177,17 @@ export abstract class BaseFormPage<
                         const arrayValue = Array.isArray(value) ? value.map(String) : [];
 
                         inputElement = (
-                            <select
-                                id={key as string}
-                                multiple // Permite selecionar vários (segure Ctrl/Cmd)
-                                value={arrayValue}
-                                onChange={this.handleMultiSelectChange}
-                                style={{ height: '120px' }} // Altura maior para ver a lista
+                            <div
+                                style={isReadonly ? { pointerEvents: 'none', opacity: 0.7 } : {}}
+                                className={disabledClass}
                             >
-                                {field.options?.map(option => (
-                                    <option key={option.value} value={option.value}>
-                                        {option.label}
-                                    </option>
-                                ))}
-                            </select>
+                                <MultiSelect
+                                    id={key as string}
+                                    options={field.options}
+                                    value={arrayValue}
+                                    onChange={(newSelectedValue) =>this.handleMultiSelectChange(key as string, newSelectedValue)}
+                                />
+                            </div>
                         );
                         break;
                     }
@@ -171,7 +199,7 @@ export abstract class BaseFormPage<
                             : imageUrl;
 
                         inputElement = (
-                            <div className="image-upload-field">
+                            <div className={`image-upload-field ${disabledClass}`}>
                                 {fullImageUrl && (
                                     <div className="image-preview">
                                         <img
@@ -186,20 +214,56 @@ export abstract class BaseFormPage<
                                     accept="image/*"
                                     onChange={(e) => this.handleImageUpload(e, key as string)}
                                     style={{ marginTop: '5px' }}
+                                    disabled={isReadonly}
+                                    className={disabledClass}
                                 />
                             </div>
                         );
                         break;
                     }
+                    case 'icon':
+                        inputElement = (
+                            <div
+                                style={isReadonly ? { pointerEvents: 'none', opacity: 0.7 } : {}}
+                                className={disabledClass}
+                            >
+                                <IconInput
+                                    id={key as string}
+                                    value={value ? String(value): ''}
+                                    onChange={this.handleChange}
+                                />
+                            </div>
+                        )
+                        break
                     case 'number':
-                        inputElement = <input id={key as string} value={Number(value)} type={"number"} onChange={this.handleChange}/>
+                        inputElement = <input
+                            id={key as string}
+                            value={Number(value)}
+                            type={"number"}
+                            onChange={this.handleChange}
+                            disabled={isReadonly}
+                            className={disabledClass}
+                        />
                         break
                     case 'color':
-                        inputElement = <input id={key as string} value={value as string} onChange={this.handleChange} type="color"/>
+                        inputElement = <input
+                            id={key as string}
+                            value={value as string}
+                            onChange={this.handleChange}
+                            type="color"
+                            disabled={isReadonly}
+                            className={disabledClass}
+                        />
                         break
                     case 'text':
                     default:
-                        inputElement = <input id={key as string} value={String(value)} onChange={this.handleChange} />;
+                        inputElement = <input
+                            id={key as string}
+                            value={String(value)}
+                            onChange={this.handleChange}
+                            disabled={isReadonly}
+                            className={disabledClass}
+                        />;
                         break;
                 }
                 return (
@@ -231,9 +295,11 @@ export abstract class BaseFormPage<
             <div className="form-wrapper">
                 <div className="form-header">
                     <h1>{this.state.title}</h1>
-                    <div className="header-actions">
-                        {this.headerActions()}
-                    </div>
+                    {this.headerActions() != null && (
+                        <div className="header-actions">
+                            {this.headerActions()}
+                        </div>
+                    )}
                 </div>
                 <main className='fields'>
                     {this.renderForm(schema)}

@@ -12,7 +12,7 @@ export interface Role {
     icon: string;
     priority: number;
     createdAt: string;
-    permissions: string[];
+    permissions: Permission[];
 }
 
 export interface UserWithRoles {

@@ -5,11 +5,12 @@ export interface FormOption {
     value: string;
 }
 
-export type FieldType = 'text' | 'textarea' | 'date' | 'select' | 'readonly' | 'multiselect' | 'image' | "number" | "color";
+export type FieldType = 'text' | 'textarea' | 'date' | 'select' | 'multiselect' | 'image' | "number" | "color" | "icon";
 
 export interface FormField {
     label: string;
     type: FieldType;
+    readonly: boolean;
     // path?: GetArrayPath;
     options?: FormOption[];
 }

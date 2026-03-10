@@ -8,17 +8,17 @@ export class CategoryHomePage extends BaseHomePage<Category, BaseProps, BaseHome
         return `${item.title} ${item.description} ${item.slug}`;
     }
     protected getItemLink(item: Category): string {
-        return `/forum/category/${item.id}`;
+        return `/forum/categories/${item.id}`;
     }
 
     protected getApiUrl(): string {
-        return `${API_FORUM_ROUTES}/category/all`;
+        return `${API_FORUM_ROUTES}/categories/all`;
     }
     protected getPageTitle(): string {
         return "Categorias"
     }
     protected getNewPath(): string {
-        return "/forum/category/new"
+        return "/forum/categories/new"
     }
     protected getNewLabel(): string {
         return "Nova Categoria"

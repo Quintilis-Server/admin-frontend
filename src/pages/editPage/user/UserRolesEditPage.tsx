@@ -10,17 +10,20 @@ type UserRolesEditData = {
     id: string;
     username: string;
     email: string;
-    roleIds: string[]; // Para uso no multiselect
+    roles: string[]; // Para uso no multiselect
 }
 
 const USER_ROLES_FORM_SCHEMA: FormSchema<UserRolesEditData> = {
-    id: { type: 'readonly', label: 'ID' },
-    username: { type: 'readonly', label: 'Nome de Usuário' },
-    email: { type: 'readonly', label: 'Email' },
-    roleIds: { type: 'multiselect', label: 'Roles', options: [] }
+    id: { type: 'text', label: 'ID', readonly: true },
+    username: { type: 'text', label: 'Nome de Usuário', readonly: true },
+    email: { type: 'text', label: 'Email', readonly: true },
+    roles: { type: 'multiselect', label: 'Roles', readonly: false, options: [] }
 }
 
 export class UserRolesEditPage extends BaseEditPage<UserRolesEditData, typeof USER_ROLES_FORM_SCHEMA> {
+    protected getReturnURL(): string {
+        return "/users"
+    }
 
     constructor(props: EditPageProps) {
         super(props, {
@@ -28,7 +31,7 @@ export class UserRolesEditPage extends BaseEditPage<UserRolesEditData, typeof US
                 id: "",
                 username: "",
                 email: "",
-                roleIds: []
+                roles: []
             },
             title: "Editar Roles do Usuário",
             err: undefined,
@@ -37,7 +40,7 @@ export class UserRolesEditPage extends BaseEditPage<UserRolesEditData, typeof US
     }
 
     protected getResourceName(): string {
-        return "auth/users";
+        return "/users";
     }
 
     protected getFormSchema(): typeof USER_ROLES_FORM_SCHEMA {
@@ -56,12 +59,14 @@ export class UserRolesEditPage extends BaseEditPage<UserRolesEditData, typeof US
             // /users/id não retorna ApiResponse, retorna direto a DTO (segundo o controller)
             // Mas o BaseComponent get() espera wrapper. Vamos usar axios direto para evitar warnings se nao tiver
             const [userRes, rolesRes] = await Promise.all([
-                axios.get<UserWithRoles>(`${AUTH_URL}/auth/users/${id}`),
-                this.get<Role[]>(`${AUTH_URL}/auth/roles`) // este tem ApiResponse
+                this.get<UserWithRoles>(`${AUTH_URL}/users/${id}`),
+                this.get<Role[]>(`${AUTH_URL}/roles/list`) // este tem ApiResponse
             ]);
 
-            const user = userRes.data;
+            const user = userRes.data.data;
             const rolesData = rolesRes.data;
+
+            console.log(user, rolesData)
 
             if (!rolesData.success) {
                 throw new Error("Falha na chamada da API de Roles.");
@@ -70,7 +75,7 @@ export class UserRolesEditPage extends BaseEditPage<UserRolesEditData, typeof US
             const allRoles = rolesData.data as unknown as Role[];
 
             const schema = this.getFormSchema();
-            schema.roleIds.options = allRoles.map(r => ({
+            schema.roles.options = allRoles.map(r => ({
                 label: `${r.displayName} (${r.name})`,
                 value: String(r.id)
             }));
@@ -84,7 +89,7 @@ export class UserRolesEditPage extends BaseEditPage<UserRolesEditData, typeof US
                     id: user.id,
                     username: user.username,
                     email: user.email,
-                    roleIds
+                    roles: roleIds
                 },
                 loading: false,
                 title: `Editar Usuário - ${user.username}`
@@ -105,17 +110,38 @@ export class UserRolesEditPage extends BaseEditPage<UserRolesEditData, typeof US
         this.setState({ loading: true, err: undefined });
 
         try {
-            const roleIds = this.state.formData.roleIds.map(Number);
+            const currentData = this.state.formData;
 
-            await axios.put(
-                `${AUTH_URL}/auth/users/${id}/roles`,
-                roleIds,
+            // 2. Montamos o payload no exato formato do UserDTO do backend
+            const payload = {
+                id: currentData.id,
+                username: currentData.username,
+                email: currentData.email,
+                // Transforma o array de strings ["1", "2"] em array de objetos [{ id: 1 }, { id: 2 }]
+                roles: currentData.roles.map(roleId => ({ id: Number(roleId) }))
+            };
+
+            // 3. Enviamos o DTO completo para a rota de update
+            await this.post(
+                `${AUTH_URL}/users/${id}/update`,
+                payload,
                 { headers: { "Content-Type": "application/json" } }
+            );
+            await this.post(
+                `${AUTH_URL}/users/${id}/update`,
+                payload
             );
 
             alert("Roles do usuário atualizadas com sucesso!");
             window.location.href = `/users`;
         } catch (e) {
+            if(axios.isAxiosError(e)) {
+                this.setState({
+                    err: BaseException.fromAxiosError(e),
+                    loading: false
+                });
+                return
+            }
             this.setState({
                 err: e instanceof BaseException ? e : new BaseException(ErrorCode.UNKNOWN_ERROR, "Erro ao salvar roles"),
                 loading: false

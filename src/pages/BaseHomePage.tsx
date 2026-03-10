@@ -4,6 +4,8 @@ import "../stylesheet/HomePageStyle.scss"
 import {ListComponent, type SortOption} from "../components/ListComponent.tsx";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import * as React from "react";
+import type {PageResponse} from "../types/ApiResponseType.ts";
 
 export type BaseHomeState<T> = PageState & {
     items: T[];
@@ -18,18 +20,23 @@ export abstract class BaseHomePage<T extends object, P extends BaseProps, S exte
     protected abstract renderItem(item: T): React.ReactNode;
     protected abstract getSearchableText(item: T): string;
     protected abstract getItemLink(item: T): string;
+    protected canCreate(): boolean {
+        return true;
+    }
+    protected withPage(): boolean{
+        return false
+    }
 
-    protected getSortOptions(): SortOption[] {
+    protected getSortOptions(): SortOption<T>[] {
         return [];
     }
 
     protected getSortValue(item: T, field: string): string | number {
-        return (item as Record<string, any>)[field] ?? "";
+        const value =(item as Record<string, any>)[field] ?? "";
+        console.log(value)
+        return value
     }
 
-    protected getPageSize(): number {
-        return 10;
-    }
 
     public constructor(props: P) {
         super(props, {
@@ -64,17 +71,20 @@ export abstract class BaseHomePage<T extends object, P extends BaseProps, S exte
                 <main>
                     <div className={"title"}>
                         <h1>{this.getPageTitle()}</h1>
-                        <a className="new-button" href={this.getNewPath()}>Novo <FontAwesomeIcon icon={faPlus}/></a>
+                        {this.canCreate() && (
+                            <a className="new-button" href={this.getNewPath()}>Novo <FontAwesomeIcon icon={faPlus}/></a>
+                        )}
                     </div>
 
                     <div className="list">
-                        <ListComponent<T, T[]>
+                        <ListComponent<T, PageResponse<T>>
                             renderItem={(item) => this.renderItem(item)}
                             getItemLink={(item) => this.getItemLink(item)}
                             getSearchableText={(item) => this.getSearchableText(item)}
                             sortOptions={this.getSortOptions()}
                             getSortValue={(item, field) => this.getSortValue(item, field)}
                             apiUrl={this.getApiUrl()}
+                            withPage={this.withPage()}
                         />
                     </div>
                 </main>

@@ -1,5 +1,6 @@
 import axios from "axios";
-import { AUTH_URL, API_OAUTH2_ROUTES } from "../Consts.ts";
+import {AUTH_URL, API_OAUTH2_ROUTES} from "../Consts.ts";
+import TokenWorker from './TokenWorker.ts?worker';
 
 export interface OAuth2TokenResponse {
     access_token: string;
@@ -16,6 +17,67 @@ export class AuthService {
     private static readonly REDIRECT_URI = window.location.origin + "/authorized"; // Atualizado conforme application.yml
 
     private static processingCodes = new Set<string>();
+
+    private static tokenWorker: Worker | null = null;
+
+    static initWorker(): void {
+        if (this.tokenWorker) return; // Evita criar dois Workers no React Strict Mode
+
+        // 🔥 TROQUE A INSTANCIAÇÃO POR ESTA LINHA AQUI:
+        this.tokenWorker = new TokenWorker();
+
+        this.tokenWorker.postMessage({
+            type: 'INIT',
+            payload: {
+                AUTH_URL: AUTH_URL,
+                CLIENT_ID: this.CLIENT_ID,
+                CLIENT_SECRET: this.CLIENT_SECRET,
+                API_OAUTH2_ROUTES: API_OAUTH2_ROUTES
+            }
+        });
+
+        // 2. Fica escutando os pedidos do Worker
+        this.tokenWorker.onmessage = (event: MessageEvent) => {
+            const { type, payload } = event.data;
+
+            switch (type) {
+                // O Worker está pedindo os dados atuais do localStorage
+                case 'CHECK_STORAGE':
+                    this.tokenWorker?.postMessage({
+                        type: 'STORAGE_DATA',
+                        payload: {
+                            refreshToken: localStorage.getItem("refreshToken"),
+                            expiresAt: localStorage.getItem("expiresAt")
+                        }
+                    });
+                    break;
+
+                // O Worker conseguiu um token novo! Vamos salvar.
+                case 'TOKENS_REFRESHED':
+                    this.saveTokens(payload);
+                    console.log("✅ [AuthService] Tokens atualizados silenciosamente pelo Worker!");
+                    break;
+
+                // O Worker desistiu ou o refresh token expirou
+                case 'SESSION_EXPIRED':
+                case 'LOGOUT_REQUIRED':
+                    console.warn("⚠️ [AuthService] Sessão expirada detectada pelo Worker. Limpando dados.");
+                    this.clearSession();
+                    // Opcional: você pode forçar um redirecionamento pra login aqui se quiser
+                    // window.location.href = "/login";
+                    break;
+            }
+        };
+    }
+
+    // 🔥 ADICIONE ESTE MÉTODO: Para desligar o Worker se precisar
+    static stopWorker(): void {
+        if (this.tokenWorker) {
+            this.tokenWorker.postMessage({ type: 'STOP' });
+            this.tokenWorker.terminate();
+            this.tokenWorker = null;
+        }
+    }
 
     static getLoginUrl(returnTo?: string): string {
         const params = new URLSearchParams();
