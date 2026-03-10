@@ -12,11 +12,11 @@ type RoleEditData = {
 }
 
 const ROLE_FORM_SCHEMA: FormSchema<RoleEditData> = {
-    name: {label: "Nome", type: "text"},
-    displayName: {label: "Nome exibido", type: "text"},
-    color: {label: "Cor", type: "color"},
-    priority: {label: "Prioridade", type: "number"},
-    permissionIds: { type: 'multiselect', label: 'Permissões', options: [] }
+    name: {label: "Nome", type: "text", readonly: false},
+    displayName: {label: "Nome exibido", type: "text", readonly: false},
+    color: {label: "Cor", type: "color", readonly: false},
+    priority: {label: "Prioridade", type: "number", readonly: false},
+    permissionIds: { type: 'multiselect', label: 'Permissões', readonly: false, options: [] }
 }
 export class RoleCreationPage extends BaseCreationPage<RoleEditData, typeof ROLE_FORM_SCHEMA> {
     state: FormState<RoleEditData> = {
