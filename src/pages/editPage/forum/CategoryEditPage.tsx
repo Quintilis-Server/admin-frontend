@@ -1,6 +1,6 @@
 import type { FormSchema } from "../../../types/FormOption.ts";
 import { BaseEditPage, type EditPageProps } from "../../BaseEditPage.tsx";
-import {API_FORUM_ROUTES, AUTH_URL} from "../../../Consts.ts";
+import {API_AUTH_ROUTES, API_FORUM_ROUTES} from "../../../Consts.ts";
 import type {Permission} from "../../../types/RoleTypes.ts";
 import type {Category} from "../../../types/ForumTypes.ts";
 import {BaseException} from "../../../exceptions/BaseException.ts";
@@ -60,7 +60,7 @@ export class CategoryEditPage extends BaseEditPage<CategoryData, typeof CATEGORY
     async componentDidMount() {
         await super.componentDidMount();
         try {
-            const response = await this.get<Permission[]>(`${AUTH_URL}/auth/permissions/all`);
+            const response = await this.get<Permission[]>(`${API_AUTH_ROUTES}/permissions/all`);
             if (response && response.data && response.data.success) {
                 const permissions = response.data.data;
                 const options = [

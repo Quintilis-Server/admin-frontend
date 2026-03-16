@@ -1,7 +1,7 @@
 import {BaseEditPage, type EditPageProps} from "../BaseEditPage.tsx";
 import type {RouteRule} from "../../types/RouteRule.ts";
 import type {FormSchema} from "../../types/FormOption.ts";
-import {AUTH_URL} from "../../Consts.ts";
+import {API_AUTH_ROUTES} from "../../Consts.ts";
 import type {Permission} from "../../types/RoleTypes.ts";
 
 const ROUTES_FORM_SCHEMA: FormSchema<RouteRule> = {
@@ -31,7 +31,7 @@ export class RoutesEditPage extends BaseEditPage<RouteRule, typeof ROUTES_FORM_S
     }
 
     protected getResourceName(): string {
-        return `${AUTH_URL}/routes`;
+        return `${API_AUTH_ROUTES}/routes`;
     }
 
     protected getReturnURL(): string {
@@ -52,7 +52,7 @@ export class RoutesEditPage extends BaseEditPage<RouteRule, typeof ROUTES_FORM_S
     async componentDidMount() {
         await super.componentDidMount();
         try {
-            const response = await this.get<Permission[]>(`${AUTH_URL}/permissions/list`);
+            const response = await this.get<Permission[]>(`${API_AUTH_ROUTES}/permissions/list`);
             if (response && response.data && response.data.success) {
                 const permissions = response.data.data;
                 const options = [

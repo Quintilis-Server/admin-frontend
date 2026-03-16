@@ -2,7 +2,7 @@ import { BasePage } from "../../BasePage.tsx";
 import type { BaseProps, PageState } from "../../../types/PageTypes.ts";
 import type { UserWithRoles } from "../../../types/RoleTypes.ts";
 import * as React from "react";
-import { AUTH_URL } from "../../../Consts.ts";
+import { API_AUTH_ROUTES } from "../../../Consts.ts";
 import "../../../stylesheet/RolesPageStyle.scss"
 import {ListComponent} from "../../../components/ListComponent.tsx";
 
@@ -74,7 +74,7 @@ export class UsersHomePage extends BasePage<BaseProps, UsersHomeState> {
                     <h1>Usuários</h1>
                 </div>
                 <ListComponent <UserWithRoles, UserWithRoles[]>
-                    apiUrl={`${AUTH_URL}/users/all/with-inactive`}
+                    apiUrl={`${API_AUTH_ROUTES}/users/all/with-inactive`}
                     renderItem={(item) => this.renderUserComponent(item)}
                     getItemLink={(item) => `/users/${item.id}/roles`}
                     getSearchableText={(item) => `${item.id} ${item.username} ${item.email}`}

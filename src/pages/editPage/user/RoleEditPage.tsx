@@ -1,7 +1,7 @@
 import type { FormSchema } from "../../../types/FormOption.ts";
 import { BaseEditPage, type EditPageProps } from "../../BaseEditPage.tsx";
 import type { Permission, Role } from "../../../types/RoleTypes.ts";
-import { AUTH_URL } from "../../../Consts.ts";
+import {API_AUTH_ROUTES} from "../../../Consts.ts";
 import { BaseException } from "../../../exceptions/BaseException.ts";
 import { ErrorCode } from "../../../types/ApiResponseType.ts";
 
@@ -65,8 +65,8 @@ export class RoleEditPage extends BaseEditPage<RoleEditData, typeof ROLE_FORM_SC
         await this.executeAsync(async () => {
             try {
                 const [roleRes, permsRes] = await Promise.all([
-                    this.get<Role>(`${AUTH_URL}/roles/${id}`),
-                    this.get<Permission[]>(`${AUTH_URL}/permissions/list`)
+                    this.get<Role>(`${API_AUTH_ROUTES}/roles/${id}`),
+                    this.get<Permission[]>(`${API_AUTH_ROUTES}/permissions/list`)
                 ]);
 
                 const roleData = roleRes.data;
@@ -136,7 +136,7 @@ export class RoleEditPage extends BaseEditPage<RoleEditData, typeof ROLE_FORM_SC
                 }
             }) as unknown as Permission[];
 
-            await this.post<Role, RoleEditData>(`${AUTH_URL}/roles/${id}/update`, payloadParaOBackend);
+            await this.post<Role, RoleEditData>(`${API_AUTH_ROUTES}/roles/${id}/update`, payloadParaOBackend);
             // await axios.put(
             //     `${AUTH_URL}/auth/roles/${id}/permissions`,
             //     permissionIds,

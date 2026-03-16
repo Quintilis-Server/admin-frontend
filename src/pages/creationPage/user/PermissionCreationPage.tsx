@@ -1,6 +1,6 @@
 import {BaseCreationPage} from "../../BaseCreationPage.tsx";
 import type {FormSchema, FormState} from "../../../types/FormOption.ts";
-import {AUTH_URL} from "../../../Consts.ts";
+import {API_AUTH_ROUTES} from "../../../Consts.ts";
 
 type PermissionData = {
     name: string
@@ -25,7 +25,7 @@ export class PermissionCreationPage extends BaseCreationPage<PermissionData, typ
     }
 
     protected getResourceName(): string {
-        return `${AUTH_URL}/auth/permissions`
+        return `${API_AUTH_ROUTES}/permissions`
     }
 
     protected getFormSchema(): typeof PERMISSION_FORM_SCHEMA {

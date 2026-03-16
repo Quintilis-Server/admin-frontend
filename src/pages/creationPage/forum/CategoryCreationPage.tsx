@@ -1,7 +1,7 @@
 import type { FormSchema, FormState } from "../../../types/FormOption.ts";
 import type { PageState } from "../../../types/PageTypes.ts";
 import { BaseCreationPage } from "../../BaseCreationPage.tsx";
-import {API_FORUM_ROUTES, AUTH_URL} from "../../../Consts.ts";
+import {API_AUTH_ROUTES, API_FORUM_ROUTES} from "../../../Consts.ts";
 import type {Permission} from "../../../types/RoleTypes.ts";
 
 type CategoryData = {
@@ -46,7 +46,7 @@ export class CategoryCreationPage extends BaseCreationPage<CategoryData, typeof 
 
     async componentDidMount() {
         try {
-            const response = await this.get<Permission[]>(`${AUTH_URL}/auth/permissions/all`);
+            const response = await this.get<Permission[]>(`${API_AUTH_ROUTES}/permissions/list`);
             if (response && response.data && response.data.success) {
                 const permissions = response.data.data;
                 const options = [

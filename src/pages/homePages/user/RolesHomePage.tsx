@@ -3,7 +3,7 @@ import type { BaseProps, PageState } from "../../../types/PageTypes.ts";
 import type {Permission, Role} from "../../../types/RoleTypes.ts";
 import * as React from "react";
 import "../../../stylesheet/RolesPageStyle.scss"
-import {AUTH_URL} from "../../../Consts.ts";
+import {API_AUTH_ROUTES} from "../../../Consts.ts";
 import {ListComponent} from "../../../components/ListComponent.tsx";
 import type {PageResponse} from "../../../types/ApiResponseType.ts";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -26,8 +26,8 @@ export class RolesHomePage extends BasePage<BaseProps, RolesHomeState> {
     async componentDidMount() {
         super.componentDidMount();
         try {
-            const roles = await this.get<PageResponse<Role>>(`${AUTH_URL}/roles/all/with-inactive`);
-            const permission = await this.get<PageResponse<Permission>>(`${AUTH_URL}/permissions/all/with-inactive`)
+            const roles = await this.get<PageResponse<Role>>(`${API_AUTH_ROUTES}/roles/all/with-inactive`);
+            const permission = await this.get<PageResponse<Permission>>(`${API_AUTH_ROUTES}/permissions/all/with-inactive`)
             if (roles && roles.data && permission && permission.data) {
                 const rolesSorted = roles.data.data.content.sort((a, b) => b.priority - a.priority);
                 this.setState({
@@ -100,7 +100,7 @@ export class RolesHomePage extends BasePage<BaseProps, RolesHomeState> {
                         sortOptions={[
                             {label: "Nome", field: "name"},
                             {label: "Id", field: "id"}
-                        ]} apiUrl={`${AUTH_URL}/permissions/all/with-inactive`}
+                        ]} apiUrl={`${API_AUTH_ROUTES}/permissions/all/with-inactive`}
                         withPage={true}
                     />
                 </div>

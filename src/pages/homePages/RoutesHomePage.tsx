@@ -1,6 +1,6 @@
 import {BaseHomePage} from "../BaseHomePage.tsx";
 import type {RouteRule} from "../../types/RouteRule.ts";
-import {AUTH_URL} from "../../Consts.ts";
+import {API_AUTH_ROUTES} from "../../Consts.ts";
 import type {SortOption} from "../../components/ListComponent.tsx";
 
 export class RoutesHomePage extends BaseHomePage<RouteRule, any, any>{
@@ -12,7 +12,7 @@ export class RoutesHomePage extends BaseHomePage<RouteRule, any, any>{
         return false
     }
     protected getApiUrl(): string {
-        return `${AUTH_URL}/routes/all`
+        return `${API_AUTH_ROUTES}/routes/all`
     }
 
     protected getSortOptions(): SortOption<RouteRule>[] {

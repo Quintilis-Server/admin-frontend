@@ -1,6 +1,6 @@
 import {BaseCreationPage} from "../../BaseCreationPage.tsx";
 import type {FormSchema, FormState} from "../../../types/FormOption.ts";
-import { AUTH_URL} from "../../../Consts.ts";
+import {API_AUTH_ROUTES} from "../../../Consts.ts";
 import type {Permission} from "../../../types/RoleTypes.ts";
 
 type RoleEditData = {
@@ -37,7 +37,7 @@ export class RoleCreationPage extends BaseCreationPage<RoleEditData, typeof ROLE
     }
 
     protected getResourceName(): string {
-        return `${AUTH_URL}/auth/role`
+        return `${API_AUTH_ROUTES}/role`
     }
 
     protected getFormSchema(): FormSchema<RoleEditData> {
@@ -46,7 +46,7 @@ export class RoleCreationPage extends BaseCreationPage<RoleEditData, typeof ROLE
 
     async componentDidMount() {
         try {
-            const response = await this.get<Permission[]>(`${AUTH_URL}/auth/permissions/all`);
+            const response = await this.get<Permission[]>(`${API_AUTH_ROUTES}/permissions/list`);
             if (response && response.data && response.data.success) {
                 const permissions = response.data.data;
                 const options = [

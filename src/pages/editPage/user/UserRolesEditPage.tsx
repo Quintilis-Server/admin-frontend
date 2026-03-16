@@ -1,7 +1,7 @@
 import type { FormSchema } from "../../../types/FormOption.ts";
 import { BaseEditPage, type EditPageProps } from "../../BaseEditPage.tsx";
 import type { Role, UserWithRoles } from "../../../types/RoleTypes.ts";
-import { AUTH_URL } from "../../../Consts.ts";
+import { API_AUTH_ROUTES } from "../../../Consts.ts";
 import axios from "axios";
 import { BaseException } from "../../../exceptions/BaseException.ts";
 import { ErrorCode } from "../../../types/ApiResponseType.ts";
@@ -59,8 +59,8 @@ export class UserRolesEditPage extends BaseEditPage<UserRolesEditData, typeof US
             // /users/id não retorna ApiResponse, retorna direto a DTO (segundo o controller)
             // Mas o BaseComponent get() espera wrapper. Vamos usar axios direto para evitar warnings se nao tiver
             const [userRes, rolesRes] = await Promise.all([
-                this.get<UserWithRoles>(`${AUTH_URL}/users/${id}`),
-                this.get<Role[]>(`${AUTH_URL}/roles/list`) // este tem ApiResponse
+                this.get<UserWithRoles>(`${API_AUTH_ROUTES}/users/${id}`),
+                this.get<Role[]>(`${API_AUTH_ROUTES}/roles/list`) // este tem ApiResponse
             ]);
 
             const user = userRes.data.data;
@@ -123,12 +123,12 @@ export class UserRolesEditPage extends BaseEditPage<UserRolesEditData, typeof US
 
             // 3. Enviamos o DTO completo para a rota de update
             await this.post(
-                `${AUTH_URL}/users/${id}/update`,
+                `${API_AUTH_ROUTES}/users/${id}/update`,
                 payload,
                 { headers: { "Content-Type": "application/json" } }
             );
             await this.post(
-                `${AUTH_URL}/users/${id}/update`,
+                `${API_AUTH_ROUTES}/users/${id}/update`,
                 payload
             );
 
