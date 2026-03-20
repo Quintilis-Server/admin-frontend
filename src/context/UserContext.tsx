@@ -143,7 +143,8 @@ export class UserProvider extends BaseComponent<{ children: ReactNode }, UserCon
         try {
             const decoded: any = jwtDecode(token);
             const roles = decoded.roles || [];
-            const isAdmin = roles.includes('ADMIN');
+            const adminsRoles = ["ADMIN", "MODERATOR"]
+            const isAdmin = adminsRoles.some(item => roles.includes(item));
 
             const user: User = {
                 id: decoded.user_id || decoded.sub,
