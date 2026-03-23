@@ -1,8 +1,8 @@
-import {BaseEditPage, type EditPageProps} from "../BaseEditPage.tsx";
-import type {RouteRule} from "../../types/RouteRule.ts";
-import type {FormSchema} from "../../types/FormOption.ts";
-import {API_AUTH_ROUTES} from "../../Consts.ts";
-import type {Permission} from "../../types/RoleTypes.ts";
+import {BaseEditPage, type EditPageProps} from "../../BaseEditPage.tsx";
+import type {RouteRule} from "../../../types/RouteRule.ts";
+import type {FormSchema} from "../../../types/FormOption.ts";
+import {API_AUTH_ROUTES} from "../../../Consts.ts";
+import type {Permission} from "../../../types/RoleTypes.ts";
 
 const ROUTES_FORM_SCHEMA: FormSchema<RouteRule> = {
     id: {label: "Id", type: "text", readonly: true},

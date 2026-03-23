@@ -4,6 +4,15 @@ import {BaseFormPage} from "./BaseFormPage.tsx";
 import {BaseException} from "../exceptions/BaseException.ts";
 import {ErrorCode} from "../types/ApiResponseType.ts";
 
+/**
+ * Base da página de criação
+ * @extends BaseFormPage que faz o trabalho de criar os elementos das páginas Form
+ *
+ * @template T Objeto a ser criado
+ * @template F `FormSchema<T>` para criação de elementos na página
+ * @template P Props da página, extende o `BaseProps`
+ * @template S State da página, extende o `FormState<T>`
+ */
 export abstract class BaseCreationPage<
     T extends object,
     F extends FormSchema<T>,

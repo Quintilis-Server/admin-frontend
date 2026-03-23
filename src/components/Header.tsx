@@ -31,9 +31,10 @@ export class Header extends BaseComponent {
                     <div className={`nav-links`}>
                         <a>Minecraft</a>
                         <a href="/forum">Forum</a>
-                        <a href="/roles">Roles</a>
-                        <a href="/users">Users</a>
-                        <a href="/routes">Permissões<br/> de rotas</a>
+                        <a href="/auth">Segurança</a>
+                        {/*<a href="/roles">Roles</a>*/}
+                        {/*<a href="/users">Users</a>*/}
+                        {/*<a href="/routes">Permissões<br/> de rotas</a>*/}
                         <a>Eventos</a>
                     </div>
 

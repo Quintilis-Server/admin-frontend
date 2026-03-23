@@ -5,7 +5,7 @@ export interface FormOption {
     value: string;
 }
 
-export type FieldType = 'text' | 'textarea' | 'date' | 'select' | 'multiselect' | 'image' | "number" | "color" | "icon";
+export type FieldType = 'text' | 'textarea' | 'date' | 'select' | 'multiselect' | 'image' | "number" | "color" | "icon" | "dynamic-list";
 
 export interface FormField {
     label: string;
@@ -15,6 +15,10 @@ export interface FormField {
     options?: FormOption[];
 }
 
+/**
+ * Cria o FormField para cada key `K` do tipo generico `T`
+ * @template T Objeto a ser usado
+ */
 export type FormSchema<T> = {
     [K in keyof T]: FormField;
 };

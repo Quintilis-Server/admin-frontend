@@ -8,7 +8,17 @@ import type {Permission} from "../types/RoleTypes.ts";
 import * as React from "react";
 import {MultiSelect} from "../components/MultiSelect.tsx";
 import {IconInput} from "../components/IconInput.tsx";
+import {DynamicListInput} from "../components/DynamicListInput.tsx";
 
+/**
+ * Criação de páginas de form (edição e criação),
+ * ele cria os elementos que vão aparecer na página a partir do `FormSchema`
+ *
+ * @template T Objeto a ser usado
+ * @template F FormSchema do `T`
+ * @template P Props da página, extende o `BaseProps`
+ * @template S State da página, extende o `FormState<T>`
+ */
 export abstract class BaseFormPage<
     T extends object,
     F extends FormSchema<T>,
@@ -216,6 +226,21 @@ export abstract class BaseFormPage<
                                     style={{ marginTop: '5px' }}
                                     disabled={isReadonly}
                                     className={disabledClass}
+                                />
+                            </div>
+                        );
+                        break;
+                    }
+                    case 'dynamic-list': { // 🔥 NOVO CASE AQUI
+                        const arrayValue = Array.isArray(value) ? value.map(String) : [];
+
+                        inputElement = (
+                            <div className={disabledClass}>
+                                <DynamicListInput
+                                    id={key as string}
+                                    value={arrayValue}
+                                    onChange={(id, newArray) => this.handleMultiSelectChange(id, newArray)}
+                                    disabled={isReadonly}
                                 />
                             </div>
                         );

@@ -12,11 +12,15 @@ import { CategoryEditPage } from "./pages/editPage/forum/CategoryEditPage.tsx";
 import { useParams } from "react-router-dom";
 import {NotFoundPage} from "./pages/NotFoundPage.tsx";
 import {RoleCreationPage} from "./pages/creationPage/user/RoleCreationPage.tsx";
-import { RoutesHomePage } from "./pages/homePages/RoutesHomePage.tsx";
-import {RoutesEditPage} from "./pages/editPage/RoutesEditPage.tsx";
+import { RoutesHomePage } from "./pages/homePages/auth/RoutesHomePage.tsx";
+import {RoutesEditPage} from "./pages/editPage/auth/RoutesEditPage.tsx";
 import {PermissionCreationPage} from "./pages/creationPage/user/PermissionCreationPage.tsx";
 import {useEffect} from "react";
 import {AuthService} from "./service/AuthService.ts";
+import {AuthHomePage} from "./pages/homePages/auth/AuthHomePage.tsx";
+import {OIDCClientHomePage} from "./pages/homePages/auth/OIDCClientHomePage.tsx";
+import {OIDCClientCreationPage} from "./pages/creationPage/auth/OIDCClientCreationPage.tsx";
+import {OIDCClientEditPage} from "./pages/editPage/auth/OIDCClientEditPage.tsx";
 
 // Wrapper para extrair 'id' via useParams e passar para páginas baseadas em classe
 const CategoryEditPageWrapper = () => {
@@ -37,6 +41,11 @@ const RoutesEditPageWrapper = () =>{
 const UserRolesEditPageWrapper = () => {
     const params = useParams();
     return <UserRolesEditPage params={params as { id: string }} />;
+}
+
+const OIDCClientEditPageWrapper = () => {
+    const params = useParams();
+    return <OIDCClientEditPage params={params as { id: string }} />;
 }
 
 function App() {
@@ -62,15 +71,21 @@ function App() {
 
                     <Route path="/permission/new" element={<PermissionCreationPage />} />
 
-                    <Route path="/roles" element={<RolesHomePage />} />
-                    <Route path="/roles/new" element={<RoleCreationPage/>}/>
-                    <Route path="/roles/:id" element={<RoleEditPageWrapper />} />
+                    <Route path="auth" element={<AuthHomePage/>} />
 
-                    <Route path="/users" element={<UsersHomePage />} />
-                    <Route path="/users/:id/roles" element={<UserRolesEditPageWrapper />} />
+                    <Route path="/auth/roles" element={<RolesHomePage />} />
+                    <Route path="/auth/roles/new" element={<RoleCreationPage/>}/>
+                    <Route path="/auth/roles/:id" element={<RoleEditPageWrapper />} />
 
-                    <Route path="/routes" element={<RoutesHomePage />}/>
-                    <Route path="/routes/:id" element={<RoutesEditPageWrapper />} />
+                    <Route path="/auth/users" element={<UsersHomePage />} />
+                    <Route path="/auth/users/:id/roles" element={<UserRolesEditPageWrapper />} />
+
+                    <Route path="/auth/routes" element={<RoutesHomePage />}/>
+                    <Route path="/auth/routes/:id" element={<RoutesEditPageWrapper />} />
+
+                    <Route path="/auth/oidc" element={<OIDCClientHomePage/>}/>
+                    <Route path="/auth/oidc/new" element={<OIDCClientCreationPage/>} />
+                    <Route path="/auth/oidc/:id" element={<OIDCClientEditPageWrapper/>}/>
 
                     <Route path="*" element={<NotFoundPage />} />
                 </Routes>
