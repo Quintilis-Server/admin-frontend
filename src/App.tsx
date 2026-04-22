@@ -69,7 +69,7 @@ function App() {
                     <Route path="/forum/categories/new" element={<CategoryCreationPage />} />
                     <Route path="/forum/categories/:id" element={<CategoryEditPageWrapper />} />
 
-                    <Route path="/permission/new" element={<PermissionCreationPage />} />
+                    <Route path="/auth/permission/new" element={<PermissionCreationPage />} />
 
                     <Route path="auth" element={<AuthHomePage/>} />
 

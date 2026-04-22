@@ -27,7 +27,7 @@ const ROLE_FORM_SCHEMA: FormSchema<RoleEditData> = {
 
 export class RoleEditPage extends BaseEditPage<RoleEditData, typeof ROLE_FORM_SCHEMA> {
     protected getReturnURL(): string {
-        return "/roles"
+        return "/auth/roles"
     }
 
     constructor(props: EditPageProps) {
@@ -72,18 +72,23 @@ export class RoleEditPage extends BaseEditPage<RoleEditData, typeof ROLE_FORM_SC
                 const roleData = roleRes.data;
                 const permsData = permsRes.data;
 
+
                 if (!roleData.success || !permsData.success) {
                     throw new Error("Falha na chamada da API.");
                 }
 
-                const role = roleData.data as unknown as Role;
-                const allPerms = permsData.data as unknown as Permission[];
+
+                const role = roleData.data as Role;
+                const allPerms = permsData.data as Permission[];
 
                 const schema = this.getFormSchema();
-                schema.permissions.options = allPerms.map(p => ({
-                    label: p.name + (p.description ? ` - ${p.description}` : ""),
-                    value: String(p.id)
-                }));
+                schema.permissions.options = allPerms.map(p => {
+                    console.log(p)
+                    return {
+                        label: p.name + (p.description ? ` - ${p.description}` : ""),
+                        value: String(p.id)
+                    }
+                });
 
                 this.setState(prevState => ({
                     ...prevState,
@@ -93,7 +98,7 @@ export class RoleEditPage extends BaseEditPage<RoleEditData, typeof ROLE_FORM_SC
                         displayName: role.displayName,
                         color: role.color,
                         priority: role.priority,
-                        permissions: role.permissions,
+                        permissions: role.permissions.map(p => String(p.id)) as unknown as Permission[],
                         icon: role.icon,
                     },
                     loading: false,
@@ -119,7 +124,6 @@ export class RoleEditPage extends BaseEditPage<RoleEditData, typeof ROLE_FORM_SC
             const payloadParaOBackend = {
                 ...this.state.formData,
             }
-
             payloadParaOBackend.permissions = this.state.formData.permissions.map((perm: any) => {
                 if (typeof perm === "string" || typeof perm === "number") {
                     return {
@@ -146,7 +150,7 @@ export class RoleEditPage extends BaseEditPage<RoleEditData, typeof ROLE_FORM_SC
 
 
             alert("Role atualizado com sucesso");
-            window.location.href = `/roles`;
+            window.location.href = `/auth/roles`;
         } catch (e) {
             this.setState({
                 err: e instanceof BaseException ? e : new BaseException(ErrorCode.UNKNOWN_ERROR, "Erro ao salvar permissões"),

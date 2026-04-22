@@ -35,7 +35,7 @@ export class RoutesEditPage extends BaseEditPage<RouteRule, typeof ROUTES_FORM_S
     }
 
     protected getReturnURL(): string {
-        return "routes"
+        return "auth/routes"
     }
 
     protected getFormSchema(): typeof ROUTES_FORM_SCHEMA {

@@ -37,7 +37,7 @@ export class RoleCreationPage extends BaseCreationPage<RoleEditData, typeof ROLE
     }
 
     protected getResourceName(): string {
-        return `${API_AUTH_ROUTES}/role`
+        return `${API_AUTH_ROUTES}/roles`
     }
 
     protected getFormSchema(): FormSchema<RoleEditData> {
@@ -49,13 +49,11 @@ export class RoleCreationPage extends BaseCreationPage<RoleEditData, typeof ROLE
             const response = await this.get<Permission[]>(`${API_AUTH_ROUTES}/permissions/list`);
             if (response && response.data && response.data.success) {
                 const permissions = response.data.data;
-                const options = [
-                    { label: "Nenhuma (Público)", value: "" },
-                    ...permissions.map((p: { id: number, name: string }) => ({
-                        label: p.name,
-                        value: String(p.id)
-                    }))
-                ];
+
+                const options = permissions.map((p: { id: number, name: string }) => ({
+                    label: p.name,
+                    value: String(p.id)
+                }));
 
                 // Hack: Modifying schema options dynamically
                 ROLE_FORM_SCHEMA.permissionIds!.options = options;
