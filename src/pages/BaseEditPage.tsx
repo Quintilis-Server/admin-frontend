@@ -43,11 +43,28 @@ export abstract class BaseEditPage<
         try {
             const response = await this.get<T>(`${resource}/${id}/with-inactive`)
             if (response && response.data) {
+                let data = response.data.data;
+
+                // --- TRATAMENTO DE DATAS AQUI ---
+                const schema = this.getFormSchema();
+                // Percorre o schema procurando campos do tipo 'date'
+                Object.keys(schema).forEach(key => {
+                    const field = schema[key as keyof T];
+                    const value = (data as any)[key];
+
+                    // Se for campo de data e tiver valor, corta para YYYY-MM-DD
+                    if (field.type === 'date' && value && typeof value === 'string') {
+                        // "2026-05-01T00:00:00Z" -> "2026-05-01"
+                        (data as any)[key] = value.split('T')[0];
+                    }
+                });
+                // --------------------------------
+
                 this.setState(prevState => ({
                     ...prevState,
-                    formData: response.data.data,
+                    formData: data,
                     loading: false
-                }))
+                }));
             }
         } catch (e) {
             this.setState({
@@ -81,7 +98,7 @@ export abstract class BaseEditPage<
 
         try {
             //TODO trocar de post para DELETE
-            const response = await this.post<null, null>(`${this.getResourceName()}/${id}/delete`, null)
+            const response = await this.delete<null>(`${this.getResourceName()}/${id}`)
 
             if (!response || !response.data || !response.data.success) throw BaseException.fromResponse(response.data)
 
@@ -101,7 +118,26 @@ export abstract class BaseEditPage<
         if (!id) return;
 
         try {
-            const response = await this.post<T, T>(`${this.getResourceName()}/${id}/update`, this.state.formData);
+            const dataToSend = { ...this.state.formData as any };
+
+            const schema = this.getFormSchema();
+            Object.keys(schema).forEach((key) => {
+                const field = schema[key as keyof T];
+                const value = (dataToSend as any)[key];
+
+                if (schema[key as keyof T].type === 'image') {
+                    delete dataToSend[key];
+                }
+
+                // Se o campo for data e tiver valor, transformamos em ISO String
+                if (field.type === 'date' && value && typeof value === 'string') {
+                    // Se a string tiver apenas 10 caracteres (YYYY-MM-DD)
+                    if (value.length === 10) {
+                        (dataToSend as any)[key] = new Date(value).toISOString();
+                    }
+                }
+            });
+            const response = await this.post<T, T>(`${this.getResourceName()}/${id}/update`, dataToSend);
             if (!response || !response.data || !response.data.success) throw BaseException.fromResponse<T>(response.data)
 
             alert("Atualizado com sucesso!")

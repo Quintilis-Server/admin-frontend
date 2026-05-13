@@ -28,7 +28,27 @@ export abstract class BaseCreationPage<
         try {
             this.setState(prevState => ({ ...prevState, loading: true }))
 
-            const response = await this.post<T, T>(`${resource}/new`, this.state.formData);
+            const dataToSend = { ...this.state.formData as any };
+
+            const schema = this.getFormSchema();
+            Object.keys(schema).forEach((key) => {
+                const field = schema[key as keyof T];
+                const value = (dataToSend as any)[key];
+
+                if (schema[key as keyof T].type === 'image') {
+                    delete dataToSend[key];
+                }
+
+                // Se o campo for data e tiver valor, transformamos em ISO String
+                if (field.type === 'date' && value && typeof value === 'string') {
+                    // Se a string tiver apenas 10 caracteres (YYYY-MM-DD)
+                    if (value.length === 10) {
+                        (dataToSend as any)[key] = new Date(value).toISOString();
+                    }
+                }
+            });
+
+            const response = await this.post<T, any>(`${resource}/new`, dataToSend);
 
             if(!response) {
                 throw new BaseException(ErrorCode.UNKNOWN_ERROR)

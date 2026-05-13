@@ -21,6 +21,9 @@ import {AuthHomePage} from "./pages/homePages/auth/AuthHomePage.tsx";
 import {OIDCClientHomePage} from "./pages/homePages/auth/OIDCClientHomePage.tsx";
 import {OIDCClientCreationPage} from "./pages/creationPage/auth/OIDCClientCreationPage.tsx";
 import {OIDCClientEditPage} from "./pages/editPage/auth/OIDCClientEditPage.tsx";
+import {MineEventHomePage} from "./pages/homePages/forum/MineEventHomePage.tsx";
+import {MineEventCreationPage} from "./pages/creationPage/event/MineEventCreationPage.tsx";
+import {MineEventEditPage} from "./pages/editPage/event/MineEventEditPage.tsx";
 
 // Wrapper para extrair 'id' via useParams e passar para páginas baseadas em classe
 const CategoryEditPageWrapper = () => {
@@ -48,6 +51,11 @@ const OIDCClientEditPageWrapper = () => {
     return <OIDCClientEditPage params={params as { id: string }} />;
 }
 
+const MineEventEditPageWrapper = () =>{
+    const params = useParams()
+    return <MineEventEditPage params={params as {id: string}} />
+}
+
 function App() {
 
     useEffect(()=>{
@@ -68,6 +76,10 @@ function App() {
                     <Route path="/forum/categories" element={<CategoryHomePage />} />
                     <Route path="/forum/categories/new" element={<CategoryCreationPage />} />
                     <Route path="/forum/categories/:id" element={<CategoryEditPageWrapper />} />
+
+                    <Route path="/forum/events" element={<MineEventHomePage />} />
+                    <Route path="/forum/events/new" element={<MineEventCreationPage />} />
+                    <Route path="/forum/events/:id" element={<MineEventEditPageWrapper />} />
 
                     <Route path="/auth/permission/new" element={<PermissionCreationPage />} />
 

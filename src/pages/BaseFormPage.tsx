@@ -50,6 +50,17 @@ export abstract class BaseFormPage<
         }));
     }
 
+    protected handleCheckboxChange = (e: ChangeEvent<HTMLInputElement>)=> {
+        const {id, checked} = e.target;
+        this.setState(prevState => ({
+            ...prevState,
+            formData: {
+                ...prevState.formData,
+                [id]: checked
+            }
+        }))
+    }
+
     protected handleMultiSelectChange = (id: string, selectedValues: string[]) => {
         this.setState(prevState => ({
             formData: {
@@ -76,7 +87,7 @@ export abstract class BaseFormPage<
             const formData = new FormData();
             formData.append('file', file);
 
-            const response = await this.post<any, FormData>(`/images/upload?folder=nominees`, formData, {
+            const response = await this.post<any, FormData>(`/images/upload`, formData, {
                 'Content-Type': 'multipart/form-data'
             });
 
@@ -280,6 +291,19 @@ export abstract class BaseFormPage<
                             className={disabledClass}
                         />
                         break
+                    case 'boolean':
+                        inputElement = (
+                            <input
+                                id={key as string} // Adicione o ID para o handleChange funcionar
+                                type="checkbox"
+                                // Checkboxes usam 'checked' para o estado visual
+                                checked={Boolean(value)}
+                                onChange={this.handleCheckboxChange} // Vamos criar este método
+                                disabled={isReadonly}
+                                className={disabledClass}
+                            />
+                        );
+                        break;
                     case 'text':
                     default:
                         inputElement = <input

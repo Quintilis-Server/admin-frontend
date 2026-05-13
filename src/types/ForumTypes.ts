@@ -6,8 +6,8 @@ export interface Category {
     title: string
     slug: string
     description: string
-    display_order: number
-    created_at: Date
+    displayOrder: number
+    createdAt: Date
     topics: Topic[]
     permissions: Permission[]
 }

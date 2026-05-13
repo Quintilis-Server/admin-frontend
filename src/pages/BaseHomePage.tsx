@@ -13,6 +13,12 @@ export type BaseHomeState<T> = PageState & {
     totalPages: number;
 }
 
+/**
+ * Pagina para escolher objeto para editar, criar
+ * @template T  **Entity**: O tipo do objeto que está sendo editado (ex: Category).
+ * @template P  **Props**: As propriedades do componente (Padrão: BaseProps).
+ * @template S  **State**: O estado do componente (Padrão: BaseHomeState<T>).
+ */
 export abstract class BaseHomePage<T extends object, P extends BaseProps, S extends BaseHomeState<T>> extends BasePage<P, S> {
     protected abstract getNewPath(): string;
     protected abstract getApiUrl(): string;
