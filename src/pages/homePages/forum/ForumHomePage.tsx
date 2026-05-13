@@ -9,9 +9,10 @@ export class ForumHomePage extends BasePage<BaseProps, PageState> {
             <main className="main-home container">
                 <h1>Forum</h1>
                 <div className="buttons">
-                    <a href="/forum/category">Categorias</a>
+                    <a href="/forum/categories">Categorias</a>
                     <a href="/forum/topic">Tópicos</a>
                     <a href="/forum/post">Posts</a>
+                    <a href="/forum/events">Eventos</a>
                 </div>
             </main>
         )

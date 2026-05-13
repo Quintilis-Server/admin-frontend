@@ -1,11 +1,11 @@
-import {BaseHomePage} from "../BaseHomePage.tsx";
-import type {RouteRule} from "../../types/RouteRule.ts";
-import {API_AUTH_ROUTES} from "../../Consts.ts";
-import type {SortOption} from "../../components/ListComponent.tsx";
+import {BaseHomePage} from "../../BaseHomePage.tsx";
+import type {RouteRule} from "../../../types/RouteRule.ts";
+import {API_AUTH_ROUTES} from "../../../Consts.ts";
+import type {SortOption} from "../../../components/ListComponent.tsx";
 
 export class RoutesHomePage extends BaseHomePage<RouteRule, any, any>{
     protected getNewPath(): string {
-        return "/routes/new"
+        return "/auth/routes/new"
     }
 
     override canCreate(): boolean {
@@ -44,7 +44,7 @@ export class RoutesHomePage extends BaseHomePage<RouteRule, any, any>{
         return `${item.urlPattern} ${item.id} ${item.permissions.join(" ")}`
     }
     protected getItemLink(item: RouteRule): string {
-        return `/routes/${item.id}`
+        return `/auth/routes/${item.id}`
     }
     override withPage(): boolean {
         return true

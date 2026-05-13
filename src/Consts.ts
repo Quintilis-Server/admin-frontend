@@ -11,3 +11,5 @@ export const FRONTEND_URL = import.meta.env.VITE_FRONTEND_URL || "https://quinti
 export const API_OAUTH2_ROUTES = `${AUTH_URL}/oauth2`; // Endpoints OAuth2 (ex: /oauth2/token)
 export const API_AUTH_ROUTES = `${API_URL}/api/auth`;
 export const API_FORUM_ROUTES = `${API_URL}/api/forum`; // Via Gateway
+
+export const API_FILE_UPLOAD = `${API_URL}/api/files/upload`

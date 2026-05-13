@@ -64,13 +64,13 @@ export class RolesHomePage extends BasePage<BaseProps, RolesHomeState> {
                 <div className="roles-page container">
                     <div className="page-header">
                         <h2>Roles</h2>
-                        <a className="new-button" href="/roles/new">
+                        <a className="new-button" href="/auth/roles/new">
                             Novo role <FontAwesomeIcon icon={faAddressCard} />
                         </a>
                     </div>
                     <div className="roles-grid">
                         {roles.map((role) => (
-                            <a key={role.id} className="role-card" href={`/roles/${role.id}`}>
+                            <a key={role.id} className="role-card" href={`/auth/roles/${role.id}`}>
                                 <div className="role-card-header">
                                     <span className="role-badge" style={{ backgroundColor: role.color }}>
                                         {role.icon && <i className={role.icon} style={{ marginRight: '8px' }}></i>}
@@ -89,13 +89,13 @@ export class RolesHomePage extends BasePage<BaseProps, RolesHomeState> {
                 <div className="roles-page container">
                     <div className="page-header">
                         <h2>Permissões</h2>
-                        <a className="new-button" href="/permission/new">
+                        <a className="new-button" href="/auth/permission/new">
                             Nova Permissão <FontAwesomeIcon icon={faKey} />
                         </a>
                     </div>
                     <ListComponent<Permission, PageResponse<Permission>>
                         renderItem={(item) => this.renderPermission(item)}
-                        getItemLink={(item) => `/permission/${item.id}`}
+                        getItemLink={(item) => `/auth/permission/${item.id}`}
                         getSearchableText={(item) => `${item.id} ${item.name} ${item.description}`}
                         sortOptions={[
                             {label: "Nome", field: "name"},

@@ -8,7 +8,17 @@ import type {Permission} from "../types/RoleTypes.ts";
 import * as React from "react";
 import {MultiSelect} from "../components/MultiSelect.tsx";
 import {IconInput} from "../components/IconInput.tsx";
+import {DynamicListInput} from "../components/DynamicListInput.tsx";
 
+/**
+ * Criação de páginas de form (edição e criação),
+ * ele cria os elementos que vão aparecer na página a partir do `FormSchema`
+ *
+ * @template T Objeto a ser usado
+ * @template F FormSchema do `T`
+ * @template P Props da página, extende o `BaseProps`
+ * @template S State da página, extende o `FormState<T>`
+ */
 export abstract class BaseFormPage<
     T extends object,
     F extends FormSchema<T>,
@@ -40,6 +50,17 @@ export abstract class BaseFormPage<
         }));
     }
 
+    protected handleCheckboxChange = (e: ChangeEvent<HTMLInputElement>)=> {
+        const {id, checked} = e.target;
+        this.setState(prevState => ({
+            ...prevState,
+            formData: {
+                ...prevState.formData,
+                [id]: checked
+            }
+        }))
+    }
+
     protected handleMultiSelectChange = (id: string, selectedValues: string[]) => {
         this.setState(prevState => ({
             formData: {
@@ -66,7 +87,7 @@ export abstract class BaseFormPage<
             const formData = new FormData();
             formData.append('file', file);
 
-            const response = await this.post<any, FormData>(`/images/upload?folder=nominees`, formData, {
+            const response = await this.post<any, FormData>(`/images/upload`, formData, {
                 'Content-Type': 'multipart/form-data'
             });
 
@@ -221,6 +242,21 @@ export abstract class BaseFormPage<
                         );
                         break;
                     }
+                    case 'dynamic-list': { // 🔥 NOVO CASE AQUI
+                        const arrayValue = Array.isArray(value) ? value.map(String) : [];
+
+                        inputElement = (
+                            <div className={disabledClass}>
+                                <DynamicListInput
+                                    id={key as string}
+                                    value={arrayValue}
+                                    onChange={(id, newArray) => this.handleMultiSelectChange(id, newArray)}
+                                    disabled={isReadonly}
+                                />
+                            </div>
+                        );
+                        break;
+                    }
                     case 'icon':
                         inputElement = (
                             <div
@@ -255,6 +291,19 @@ export abstract class BaseFormPage<
                             className={disabledClass}
                         />
                         break
+                    case 'boolean':
+                        inputElement = (
+                            <input
+                                id={key as string} // Adicione o ID para o handleChange funcionar
+                                type="checkbox"
+                                // Checkboxes usam 'checked' para o estado visual
+                                checked={Boolean(value)}
+                                onChange={this.handleCheckboxChange} // Vamos criar este método
+                                disabled={isReadonly}
+                                className={disabledClass}
+                            />
+                        );
+                        break;
                     case 'text':
                     default:
                         inputElement = <input

@@ -100,6 +100,25 @@ export class BaseComponent<P = object, S extends BaseState = BaseState> extends 
         }
     }
 
+    protected async delete<T>(url: string, header: object | null = null): Promise<AxiosResponse<ApiResponseType<T>>> {
+        const headers = {
+            "Content-Type": "application/json",
+            ...header
+        }
+        this.startLoading()
+        try{
+            return await axios.delete(url, {headers})
+        }catch (e) {
+            if(axios.isAxiosError(e)){
+                throw BaseException.fromAxiosError<T>(e);
+            } else {
+                throw new BaseException(ErrorCode.UNKNOWN_ERROR, "Erro no DELETE")
+            }
+        } finally {
+            this.stopLoading()
+        }
+    }
+
     // protected async postToApi<T, B>(url: string, body: B, header: object | null = null): Promise<AxiosResponse<ApiResponseType<T>>> {
     //     const headers = {
     //         "Content-Type": "application/json",

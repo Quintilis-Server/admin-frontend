@@ -21,7 +21,7 @@ export class PermissionCreationPage extends BaseCreationPage<PermissionData, typ
     }
 
     protected getReturnURL(): string {
-        return "/roles"
+        return "/auth/roles"
     }
 
     protected getResourceName(): string {
