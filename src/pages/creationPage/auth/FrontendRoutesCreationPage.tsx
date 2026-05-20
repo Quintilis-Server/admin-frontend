@@ -1,21 +1,20 @@
 import {BaseCreationPage} from "../../BaseCreationPage.tsx";
 import { invalidateRoutesCache } from "../../../context/RouteContext.tsx";
-import type {FrontendRoute} from "../../../types/FrontendRoute.ts";
+import type {FrontendRouteData} from "../../../types/FrontendRoute.ts";
 import type {FormSchema} from "../../../types/FormOption.ts";
 import {API_AUTH_ROUTES} from "../../../Consts.ts";
 import type {Permission} from "../../../types/RoleTypes.ts";
 
-const FORM_SCHEMA: FormSchema<FrontendRoute> = {
+const FORM_SCHEMA: FormSchema<FrontendRouteData> = {
     path: {label:"Caminho (Path)", type:"text", readonly: false},
     permissions: {label: "Permissões Exigidas", type: "multiselect", readonly: false},
     description: {label: "Descrição", type: "text", readonly: false},
 }
 
-export class FrontendRoutesCreationPage extends BaseCreationPage<FrontendRoute, typeof FORM_SCHEMA> {
+export class FrontendRoutesCreationPage extends BaseCreationPage<FrontendRouteData, typeof FORM_SCHEMA> {
     constructor(props: any) {
         super(props, {
             formData: {
-                id: "",
                 path: "",
                 permissions: [],
                 description: "",
