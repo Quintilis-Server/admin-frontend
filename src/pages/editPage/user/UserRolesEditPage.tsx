@@ -22,7 +22,7 @@ const USER_ROLES_FORM_SCHEMA: FormSchema<UserRolesEditData> = {
 
 export class UserRolesEditPage extends BaseEditPage<UserRolesEditData, typeof USER_ROLES_FORM_SCHEMA> {
     protected getReturnURL(): string {
-        return "/users"
+        return "/auth/users"
     }
 
     constructor(props: EditPageProps) {
@@ -133,7 +133,7 @@ export class UserRolesEditPage extends BaseEditPage<UserRolesEditData, typeof US
             );
 
             alert("Roles do usuário atualizadas com sucesso!");
-            window.location.href = `/users`;
+            window.location.href = `/auth/users`;
         } catch (e) {
             if(axios.isAxiosError(e)) {
                 this.setState({

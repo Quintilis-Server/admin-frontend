@@ -14,6 +14,8 @@ export interface UserContextProps {
     login: (username: string, password: string) => Promise<void>;
     logout: () => void;
     revalidate: () => void;
+    hasPermission: (permission: string) => boolean;
+    hasAnyPermission: (permissions: string[]) => boolean;
 }
 
 type UserContextState = BaseState & {
@@ -32,6 +34,8 @@ export const UserContext = createContext<UserContextProps>({
     login: async () => { },
     logout: () => { },
     revalidate: () => { },
+    hasPermission: () => false,
+    hasAnyPermission: () => false,
 })
 
 export class UserProvider extends BaseComponent<{ children: ReactNode }, UserContextState> {
@@ -143,6 +147,7 @@ export class UserProvider extends BaseComponent<{ children: ReactNode }, UserCon
         try {
             const decoded: any = jwtDecode(token);
             const roles = decoded.roles || [];
+            const permissions = decoded.permissions || [];
             const adminsRoles = ["ADMIN", "MODERATOR"]
             const isAdmin = adminsRoles.some(item => roles.includes(item));
 
@@ -150,6 +155,7 @@ export class UserProvider extends BaseComponent<{ children: ReactNode }, UserCon
                 id: decoded.user_id || decoded.sub,
                 username: decoded.username || decoded.preferred_username,
                 roles: roles,
+                permissions: permissions,
                 avatarPath: decoded.avatar_path || undefined,
                 isVerified: decoded.email_verified || false
             };
@@ -217,6 +223,17 @@ export class UserProvider extends BaseComponent<{ children: ReactNode }, UserCon
         });
     }
 
+    private hasPermission = (permission: string): boolean => {
+        if (!this.state.user) return false;
+        // ADMIN roles have all permissions implicitly, or we just check the permissions array
+        return this.state.user.permissions.includes(permission);
+    }
+
+    private hasAnyPermission = (permissions: string[]): boolean => {
+        if (!this.state.user) return false;
+        return permissions.some(p => this.state.user!.permissions.includes(p));
+    }
+
     render() {
         return (
             <UserContext.Provider value={{
@@ -227,7 +244,9 @@ export class UserProvider extends BaseComponent<{ children: ReactNode }, UserCon
                 loading: this.state.loading,
                 login: this.login,
                 logout: this.logout,
-                revalidate: this.revalidate
+                revalidate: this.revalidate,
+                hasPermission: this.hasPermission,
+                hasAnyPermission: this.hasAnyPermission
             }}>
                 {this.props.children}
             </UserContext.Provider>

@@ -10,6 +10,7 @@ export class AuthHomePage extends BasePage<any, any>{
                     <a href={"/auth/routes"}>Endpoints</a>
                     <a href={"/auth/users"}>Usuarios</a>
                     <a href={"/auth/roles"}>Roles/Permissões</a>
+                    <a href={"/auth/frontend-routes"}>Páginas</a>
                     <a href={"/auth/oidc"}>OIDC Clients</a>
                 </div>
             </main>

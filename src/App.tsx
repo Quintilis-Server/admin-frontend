@@ -25,6 +25,18 @@ import {MineEventHomePage} from "./pages/homePages/forum/MineEventHomePage.tsx";
 import {MineEventCreationPage} from "./pages/creationPage/event/MineEventCreationPage.tsx";
 import {MineEventEditPage} from "./pages/editPage/event/MineEventEditPage.tsx";
 
+import {FrontendRoutesHomePage} from "./pages/homePages/auth/FrontendRoutesHomePage.tsx";
+import {FrontendRoutesCreationPage} from "./pages/creationPage/auth/FrontendRoutesCreationPage.tsx";
+import {FrontendRoutesEditPage} from "./pages/editPage/auth/FrontendRoutesEditPage.tsx";
+
+import { RouteProvider } from "./context/RouteContext.tsx";
+import { ProtectedRoute } from "./components/ProtectedRoute.tsx";
+
+// Wrapper global para rotas
+const Guarded = ({ children }: { children: React.ReactNode }) => (
+    <ProtectedRoute>{children}</ProtectedRoute>
+);
+
 // Wrapper para extrair 'id' via useParams e passar para páginas baseadas em classe
 const CategoryEditPageWrapper = () => {
     const params = useParams();
@@ -39,6 +51,11 @@ const RoleEditPageWrapper = () => {
 const RoutesEditPageWrapper = () =>{
     const params = useParams()
     return <RoutesEditPage params={params as { id: string }}/>
+}
+
+const FrontendRoutesEditPageWrapper = () =>{
+    const params = useParams()
+    return <FrontendRoutesEditPage params={params as { id: string }}/>
 }
 
 const UserRolesEditPageWrapper = () => {
@@ -67,41 +84,47 @@ function App() {
 
     return (
         <UserProvider>
-            <Router>
-                <Routes>
-                    <Route path="/" element={<HomePage />} />
-                    <Route path="/authorized" element={<HomePage />} /> {/* Rota de callback que renderiza a Home (o UserProvider vai capturar o code) */}
+            <RouteProvider>
+                <Router>
+                    <Routes>
+                        <Route path="/" element={<Guarded><HomePage /></Guarded>} />
+                        <Route path="/authorized" element={<HomePage />} /> {/* Rota de callback */}
 
-                    <Route path="/forum" element={<ForumHomePage />} />
-                    <Route path="/forum/categories" element={<CategoryHomePage />} />
-                    <Route path="/forum/categories/new" element={<CategoryCreationPage />} />
-                    <Route path="/forum/categories/:id" element={<CategoryEditPageWrapper />} />
+                        <Route path="/forum" element={<Guarded><ForumHomePage /></Guarded>} />
+                        <Route path="/forum/categories" element={<Guarded><CategoryHomePage /></Guarded>} />
+                        <Route path="/forum/categories/new" element={<Guarded><CategoryCreationPage /></Guarded>} />
+                        <Route path="/forum/categories/:id" element={<Guarded><CategoryEditPageWrapper /></Guarded>} />
 
-                    <Route path="/forum/events" element={<MineEventHomePage />} />
-                    <Route path="/forum/events/new" element={<MineEventCreationPage />} />
-                    <Route path="/forum/events/:id" element={<MineEventEditPageWrapper />} />
+                        <Route path="/forum/events" element={<Guarded><MineEventHomePage /></Guarded>} />
+                        <Route path="/forum/events/new" element={<Guarded><MineEventCreationPage /></Guarded>} />
+                        <Route path="/forum/events/:id" element={<Guarded><MineEventEditPageWrapper /></Guarded>} />
 
-                    <Route path="/auth/permission/new" element={<PermissionCreationPage />} />
+                        <Route path="/auth/permission/new" element={<Guarded><PermissionCreationPage /></Guarded>} />
 
-                    <Route path="auth" element={<AuthHomePage/>} />
+                        <Route path="auth" element={<Guarded><AuthHomePage/></Guarded>} />
 
-                    <Route path="/auth/roles" element={<RolesHomePage />} />
-                    <Route path="/auth/roles/new" element={<RoleCreationPage/>}/>
-                    <Route path="/auth/roles/:id" element={<RoleEditPageWrapper />} />
+                        <Route path="/auth/roles" element={<Guarded><RolesHomePage /></Guarded>} />
+                        <Route path="/auth/roles/new" element={<Guarded><RoleCreationPage/></Guarded>}/>
+                        <Route path="/auth/roles/:id" element={<Guarded><RoleEditPageWrapper /></Guarded>} />
 
-                    <Route path="/auth/users" element={<UsersHomePage />} />
-                    <Route path="/auth/users/:id/roles" element={<UserRolesEditPageWrapper />} />
+                        <Route path="/auth/users" element={<Guarded><UsersHomePage /></Guarded>} />
+                        <Route path="/auth/users/:id/roles" element={<Guarded><UserRolesEditPageWrapper /></Guarded>} />
 
-                    <Route path="/auth/routes" element={<RoutesHomePage />}/>
-                    <Route path="/auth/routes/:id" element={<RoutesEditPageWrapper />} />
+                        <Route path="/auth/routes" element={<Guarded><RoutesHomePage /></Guarded>}/>
+                        <Route path="/auth/routes/:id" element={<Guarded><RoutesEditPageWrapper /></Guarded>} />
 
-                    <Route path="/auth/oidc" element={<OIDCClientHomePage/>}/>
-                    <Route path="/auth/oidc/new" element={<OIDCClientCreationPage/>} />
-                    <Route path="/auth/oidc/:id" element={<OIDCClientEditPageWrapper/>}/>
+                        <Route path="/auth/frontend-routes" element={<Guarded><FrontendRoutesHomePage /></Guarded>}/>
+                        <Route path="/auth/frontend-routes/new" element={<Guarded><FrontendRoutesCreationPage /></Guarded>} />
+                        <Route path="/auth/frontend-routes/:id" element={<Guarded><FrontendRoutesEditPageWrapper /></Guarded>} />
 
-                    <Route path="*" element={<NotFoundPage />} />
-                </Routes>
-            </Router>
+                        <Route path="/auth/oidc" element={<Guarded><OIDCClientHomePage/></Guarded>}/>
+                        <Route path="/auth/oidc/new" element={<Guarded><OIDCClientCreationPage/></Guarded>} />
+                        <Route path="/auth/oidc/:id" element={<Guarded><OIDCClientEditPageWrapper/></Guarded>}/>
+
+                        <Route path="*" element={<Guarded><NotFoundPage /></Guarded>} />
+                    </Routes>
+                </Router>
+            </RouteProvider>
         </UserProvider>
     )
 }
