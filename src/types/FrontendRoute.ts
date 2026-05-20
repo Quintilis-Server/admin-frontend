@@ -6,7 +6,7 @@ export interface FrontendRouteData{
     permissions: Permission[];
 }
 export interface FrontendRoute{
-    id: number;
+    id: string;
     path: string;
     description?: string;
     permissions: Permission[];
