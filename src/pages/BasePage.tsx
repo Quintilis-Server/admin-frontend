@@ -3,10 +3,9 @@ import {BaseComponent} from "../components/BaseComponent.tsx";
 import type {BaseException} from "../exceptions/BaseException.ts";
 import {Header} from "../components/Header.tsx";
 import {UserContext} from "../context/UserContext.tsx";
-import {FRONTEND_URL} from "../Consts.ts";
 import {AuthService} from "../service/AuthService.ts";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faBan, faTriangleExclamation} from "@fortawesome/free-solid-svg-icons";
+import {faTriangleExclamation} from "@fortawesome/free-solid-svg-icons";
 import "../stylesheet/LoadingStyle.scss"
 import "../stylesheet/ErrorPopupStyle.scss"
 
