@@ -76,7 +76,7 @@ export class UsersHomePage extends BasePage<BaseProps, UsersHomeState> {
                 <ListComponent <UserWithRoles, UserWithRoles[]>
                     apiUrl={`${API_AUTH_ROUTES}/users/all/with-inactive`}
                     renderItem={(item) => this.renderUserComponent(item)}
-                    getItemLink={(item) => `/users/${item.id}/roles`}
+                    getItemLink={(item) => `/auth/users/${item.id}/roles`}
                     getSearchableText={(item) => `${item.id} ${item.username} ${item.email}`}
                     sortOptions={[
                         {label: "Username", field: "username"},

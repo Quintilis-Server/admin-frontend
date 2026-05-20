@@ -119,49 +119,18 @@ export abstract class BasePage<P extends BaseProps, S extends PageState> extends
         )
     }
 
-    private renderNotAdminModal() {
-        return (
-            <div className="session-expired-overlay">
-                <div className="session-expired-modal">
-                    <div className="session-expired-icon"><FontAwesomeIcon icon={faBan}/></div>
-                    <h2>Acesso Negado</h2>
-                    <p>Você não tem permissão de administrador.</p>
-                    <div className="session-expired-actions">
-                        <button
-                            className="session-expired-btn session-expired-btn-primary"
-                            onClick={() => {
-                                // AuthService.logout()
-                                window.location.href = FRONTEND_URL;
-                            }}
-                        >
-                            Ir para o site
-                        </button>
-                        <button
-                            className="session-expired-btn session-expired-btn-secondary"
-                            onClick={() => {
-                                AuthService.logout();
-                            }}
-                        >
-                            Sair
-                        </button>
-                    </div>
-                </div>
-            </div>
-        );
-    }
+    // Removed renderNotAdminModal as access is now handled dynamically
 
     protected abstract renderContent(): React.ReactNode;
 
     render() {
         const showSessionExpired = !this.context.loading && !this.context.isLoggedIn;
-        const showNotAdmin = !this.context.loading && this.context.isLoggedIn && !this.context.isAdmin;
 
         return (
             <>
                 <Header />
                 {this.state.err && this.renderErrorPopup(this.state.err)}
                 {showSessionExpired && this.renderSessionExpiredModal()}
-                {showNotAdmin && this.renderNotAdminModal()}
                 {this.state.loading ? this.renderLoading() : this.renderContent()}
                 {/*<Footer/>*/}
             </>
